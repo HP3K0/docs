@@ -1,0 +1,30 @@
+---
+title: "Subscriptions"
+description: "Subscriptions are employed as access control to the USSD service."
+icon: "pay"
+---
+
+Subscriptions are a distinct module within PeoplesPay, first introduced as a form of access control for the USSD service.
+
+A merchant must have an active subscription to use the USSD service. The current schema is displayed in the code block below.
+
+<CodeGroup>
+```typescript subscription.model.ts
+interface ISubscription {
+    merchantId: string,
+    subscriptionStartDate: string,
+    subscriptionTerm: number,
+    ussdSubscriptionLevel: USSDSubscriptionLevel,
+    subscriptionTransactionId: string,
+    isSubscriptionActive: boolean
+}
+
+enum USSDSubscriptionLevel {
+    base="base",
+    oneDigit="1",
+    twoDigit="2",
+    threeDigit="3"
+}
+```
+</CodeGroup>
+
