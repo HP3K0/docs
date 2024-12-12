@@ -176,10 +176,10 @@
     },
     "/hub/merchants/itc/get": {
       "get": {
-        "description": "Retrieves all billers from ITC",
+        "description": "Retrieves all billers",
         "responses": {
           "200": {
-            "description": "Biilers retrieved",
+            "description": "Billers retrieved",
             "content": {
               "application/json": {
                 "schema": {

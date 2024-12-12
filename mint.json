@@ -36,19 +36,7 @@
       "group": "Get Started",
       "pages": [
         "introduction",
-        "quickstart",
-        "development"
-      ]
-    },
-    {
-      "group": "Essentials",
-      "pages": [
-        "essentials/markdown",
-        "essentials/code",
-        "essentials/images",
-        "essentials/settings",
-        "essentials/navigation",
-        "essentials/reusable-snippets"
+        "quickstart"
       ]
     },
     {
@@ -75,8 +63,13 @@
     {
       "group": "Bill payments",
       "pages": [
-        "api-reference/bills-introduction",
         "api-reference/endpoint/get-billers"
+      ]
+    },
+    {
+      "group": "Bills",
+      "pages": [
+        "bills/introduction"
       ]
     },
     {
