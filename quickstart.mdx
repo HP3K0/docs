@@ -1,86 +1,47 @@
 ---
 title: 'Quickstart'
-description: 'Start building awesome documentation in under 5 minutes'
+description: 'Start collecting and disbursing funds in mere minutes'
 ---
 
-## Setup your development
+Welcome to PeoplesPay! This guide will take you through the basics of collecting money (into your PeoplesPay account) as well as disbursing money (sending money to a customer from your PeoplesPay account).
+This quickstart outlines these operations via the PeoplesPay API, so you will need to have access to that first.
 
-Learn how to update your docs locally and deploy them to the public.
-
-### Edit and preview
-
+## Prerequisites
 <AccordionGroup>
-  <Accordion icon="github" title="Clone your docs locally">
-    During the onboarding process, we created a repository on your Github with
-    your docs content. You can find this repository on our
-    [dashboard](https://dashboard.mintlify.com). To clone the repository
-    locally, follow these
-    [instructions](https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository)
-    in your terminal.
+  <Accordion title="Approved merchant account">
+    The final step of the PeoplesPay onboarding process involves approval. If you've submitted all requested documents, that final step may not have been completed, especially when review takes longer than anticipated. Ensure you've been approved before going ahead to perform the operations in this guide.
   </Accordion>
-  <Accordion icon="rectangle-terminal" title="Preview changes">
-    Previewing helps you make sure your changes look as intended. We built a
-    command line interface to render these changes locally. 1. Install the
-    [Mintlify CLI](https://www.npmjs.com/package/mintlify) to preview the
-    documentation changes locally with this command: ``` npm i -g mintlify ```
-    2. Run the following command at the root of your documentation (where
-    `mint.json` is): ``` mintlify dev ```
+  <Accordion title="API access">
+    API access requires the use of an API key. You will find your API key by accessing the [merchant portal](https://merchants.peoplespay.com.gh)
   </Accordion>
 </AccordionGroup>
 
-### Deploy your changes
+## Collecting money
+Collections are the primary method to credit a PeoplesPay account (used interchangeably with *wallet*). Collections involve the transfer of money from an external account, either a mobile money wallet or a bank card, to a specified PeoplesPay account.
+Virtually all PeoplesPay accounts can perform collections, which isn't the case for disbursements. A collection is a type of *transaction*; on the merchant portal, collections have a `transactionType` of `RM`. 
 
-<AccordionGroup>
+<Note>
+  If you cannot perfom a collection, and your account has not been disabled, try contacting [support](mailto:info@peoplespay.com.gh). 
+</Note>
 
-<Accordion icon="message-bot" title="Install our Github app">
-  Our Github app automatically deploys your changes to your docs site, so you
-  don't need to manage deployments yourself. You can find the link to install on
-  your [dashboard](https://dashboard.mintlify.com). Once the bot has been
-  successfully installed, there should be a check mark next to the commit hash
-  of the repo.
-</Accordion>
-<Accordion icon="rocket" title="Push your changes">
-  [Commit and push your changes to
-  Git](https://docs.github.com/en/get-started/using-git/pushing-commits-to-a-remote-repository#about-git-push)
-  for your changes to update in your docs site. If you push and don't see that
-  the Github app successfully deployed your changes, you can also manually
-  update your docs through our [dashboard](https://dashboard.mintlify.com).
-</Accordion>
+<Steps>
+  <Step title="Request a collections access token">
+    Send a POST request to generate an access token to perform a collection. Specify the `merchantId`, `apikey` and `operation` in the request body.
+  </Step>
+  <Step title="Perform a collections request">
+    Send a POST request containing all required information for the collections transaction.
+  </Step>
+  <Step title="Authorize payment (non-card)">
+    The customer authorizes payment.
+  </Step>
+  <Step title="Verify">
+    Check your PeoplesPay account balance and transaction history for the relevant collections transaction. The initial status of the transaction will be **pending**, which is eventually resolved to **paid** or **failed**.
+  </Step>
+</Steps>
 
-</AccordionGroup>
+## Disbursing money
+Disbursements are very similar to collections. The main steps are the same, and the outcome is the same. The following points are of note, however:
+- **failed** disbursements will result in a balance deduction by the corresponding transaction amount.
+- access to disbursement is not available to all PeoplesPay accounts. If this is the case for you, reach out to support.
+- disbursements can be performed into mobile money wallets and/or bank accounts.
 
-## Update your docs
-
-Add content directly in your files with MDX syntax and React components. You can use any of our components, or even build your own.
-
-<CardGroup>
-
-<Card title="Style Your Docs" icon="paintbrush" href="/settings/global">
-  Add flair to your docs with personalized branding.
-</Card>
-
-<Card
-  title="Add API Endpoints"
-  icon="square-code"
-  href="/api-playground/configuration"
->
-  Implement your OpenAPI spec and enable API user interaction.
-</Card>
-
-<Card
-  title="Integrate Analytics"
-  icon="chart-mixed"
-  href="/analytics/supported-integrations"
->
-  Draw insights from user interactions with your documentation.
-</Card>
-
-<Card
-  title="Host on a Custom Domain"
-  icon="browser"
-  href="/settings/custom-domain/subdomain"
->
-  Keep your docs on your own website's subdomain.
-</Card>
-
-</CardGroup>

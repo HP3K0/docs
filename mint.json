@@ -1,18 +1,18 @@
 {
   "$schema": "https://mintlify.com/schema.json",
-  "name": "Starter Kit",
+  "name": "PeoplesPay API Documentation",
   "logo": {
-    "dark": "/logo/dark.svg",
-    "light": "/logo/light.svg"
+    "dark": "/logo/pp-logo-white.svg",
+    "light": "/logo/pp-logo-orig.svg"
   },
   "favicon": "/favicon.svg",
   "colors": {
-    "primary": "#0D9373",
-    "light": "#07C983",
-    "dark": "#0D9373",
+    "primary": "#bd2130",
+    "light": "#f8e8ea",
+    "dark": "#bd2130",
     "anchors": {
-      "from": "#0D9373",
-      "to": "#07C983"
+      "from": "#bd2130",
+      "to": "#f8e8ea"
     }
   },
   "topbarLinks": [
@@ -29,23 +29,6 @@
     {
       "name": "API Reference",
       "url": "api-reference"
-    }
-  ],
-  "anchors": [
-    {
-      "name": "Documentation",
-      "icon": "book-open-cover",
-      "url": "https://mintlify.com/docs"
-    },
-    {
-      "name": "Community",
-      "icon": "slack",
-      "url": "https://mintlify.com/community"
-    },
-    {
-      "name": "Blog",
-      "icon": "newspaper",
-      "url": "https://mintlify.com/blog"
     }
   ],
   "navigation": [
@@ -75,11 +58,25 @@
       ]
     },
     {
-      "group": "Endpoint Examples",
+      "group": "Operations",
       "pages": [
-        "api-reference/endpoint/get",
-        "api-reference/endpoint/create",
-        "api-reference/endpoint/delete"
+        "api-reference/endpoint/get-token",
+        "api-reference/endpoint/collect-momo",
+        "api-reference/endpoint/collect-card"
+      ]
+    },
+    {
+      "group": "Transaction Management",
+      "pages": [
+        "api-reference/endpoint/get-transaction",
+        "api-reference/endpoint/get-transactions"
+      ]
+    },
+    {
+      "group": "Bill payments",
+      "pages": [
+        "api-reference/bills-introduction",
+        "api-reference/endpoint/get-billers"
       ]
     },
     {

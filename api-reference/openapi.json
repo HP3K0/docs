@@ -1,8 +1,8 @@
 {
   "openapi": "3.0.1",
   "info": {
-    "title": "OpenAPI Plant Store",
-    "description": "A sample API that uses a plant store as an example to demonstrate features in the OpenAPI specification",
+    "title": "PeoplesPay API Documentation",
+    "description": "PeoplesPay API endpoints, payloads and relevant notes.",
     "license": {
       "name": "MIT"
     },
@@ -10,7 +10,7 @@
   },
   "servers": [
     {
-      "url": "http://sandbox.mintlify.com"
+      "url": "https://peoplespay.com.gh/peoplepay"
     }
   ],
   "security": [
@@ -19,30 +19,27 @@
     }
   ],
   "paths": {
-    "/plants": {
-      "get": {
-        "description": "Returns all plants from the system that the user has access to",
-        "parameters": [
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "The maximum number of results to return",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
+    "/hub/token/get": {
+      "post": {
+        "description": "Returns a token for an operation (collection or disbursement)",
+        "requestBody": {
+          "description": "Specifed operation for given merchant and API user",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TypeOfTransactionToken"
+              }
             }
-          }
-        ],
+          },
+          "required": true
+        },
         "responses": {
           "200": {
-            "description": "Plant response",
+            "description": "Token generation response",
             "content": {
               "application/json": {
                 "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/Plant"
-                  }
+                  "$ref": "#/components/schemas/SuccessfulTokenResponse"
                 }
               }
             }
@@ -58,27 +55,81 @@
             }
           }
         }
-      },
+      }
+    },
+    "/hub/collectmoney": {
       "post": {
-        "description": "Creates a new plant in the store",
+        "description": "Initiates a request to pay, sent to the specified mobile number",
         "requestBody": {
-          "description": "Plant to add to the store",
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/NewPlant"
+                "$ref": "#/components/schemas/MomoCollections"
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {
-            "description": "plant response",
+            "description": "Response for successfully received request to collect",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Plant"
+                  "$ref": "#/components/schemas/SuccessfulTransactionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hub/collectmoney/card": {
+      "post": {
+        "description": "Initiates a request to pay, to the provided bank card",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CardCollections"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Response for successfully received request to collect",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessfulTransactionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hub/transactions/get/{id}": {
+      "get": {
+        "description": "Retrieves a transaction based on the ID supplied",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "ID of transaction to retrieve",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Transaction retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetrievedTransactionResponse"
                 }
               }
             }
@@ -96,25 +147,46 @@
         }
       }
     },
-    "/plants/{id}": {
-      "delete": {
-        "description": "Deletes a single plant based on the ID supplied",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "description": "ID of plant to delete",
-            "required": true,
-            "schema": {
-              "type": "integer",
-              "format": "int64"
+    "/hub/transactions/get": {
+      "get": {
+        "description": "Retrieves all transactions for current merchant",
+        "responses": {
+          "200": {
+            "description": "Transactions retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetrievedAllTransactionsResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
             }
           }
-        ],
+        }
+      }
+    },
+    "/hub/merchants/itc/get": {
+      "get": {
+        "description": "Retrieves all billers from ITC",
         "responses": {
-          "204": {
-            "description": "Plant deleted",
-            "content": {}
+          "200": {
+            "description": "Biilers retrieved",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetrievedBillersResponse"
+                }
+              }
+            }
           },
           "400": {
             "description": "unexpected error",
@@ -132,64 +204,327 @@
   },
   "components": {
     "schemas": {
-      "Plant": {
+      "TransactionToken": {
         "required": [
-          "name"
+          "merchantId",
+          "apikey"
         ],
         "type": "object",
         "properties": {
-          "name": {
-            "description": "The name of the plant",
+          "merchantId": {
+            "description": "The merchant's merchantId",
             "type": "string"
           },
-          "tag": {
-            "description": "Tag to specify the type",
+          "apikey": {
+            "description": "The apikey for the app to collect through",
             "type": "string"
           }
         }
       },
-      "NewPlant": {
+      "TypeOfTransactionToken": {
         "allOf": [
           {
-            "$ref": "#/components/schemas/Plant"
+            "$ref": "#/components/schemas/TransactionToken"
           },
           {
             "required": [
-              "id"
+              "operation"
             ],
             "type": "object",
             "properties": {
-              "id": {
-                "description": "Identification number of the plant",
-                "type": "integer",
-                "format": "int64"
+              "operation": {
+                "description": "The kind of operation to perform",
+                "type": "string",
+                "enum": [
+                  "DEBIT",
+                  "CREDIT"
+                ]
               }
             }
           }
         ]
       },
-      "Error": {
+      "Collections": {
         "required": [
-          "error",
-          "message"
+          "amount",
+          "account_name",
+          "description",
+          "callbackUrl"
         ],
         "type": "object",
         "properties": {
-          "error": {
-            "type": "integer",
-            "format": "int32"
+          "amount": {
+            "description": "Total amount to collect",
+            "type": "number",
+            "format": "float"
+          },
+          "account_name": {
+            "description": "Account holder name",
+            "type": "string"
+          },
+          "description": {
+            "description": "Brief description of the transaction",
+            "type": "string"
+          },
+          "callbackUrl": {
+            "type": "string",
+            "description": "The URL that will receive webhook containing transaction status."
+          }
+        }
+      },
+      "MomoCollections": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Collections"
+          },
+          {
+            "required": [
+              "account_number",
+              "account_issuer"
+            ],
+            "type": "object",
+            "properties": {
+              "account_number": {
+                "description": "Account number",
+                "type": "string"
+              },
+              "account_issuer": {
+                "description": "Account number's network provider",
+                "type": "string",
+                "enum": [
+                  "mtn",
+                  "vodafone",
+                  "airteltigo"
+                ]
+              }
+            }
+          }
+        ]
+      },
+      "CardCollections": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Collections"
+          },
+          {
+            "required": [
+              "card",
+              "clientRedirectUrl"
+            ],
+            "type": "object",
+            "properties": {
+              "card": {
+                "description": "Object containing card details",
+                "type": "object",
+                "properties": {
+                  "cvc": {
+                    "type": "string",
+                    "maximum": 3,
+                    "description": "Security code"
+                  },
+                  "expiry": {
+                    "type": "string",
+                    "description": "Card expiry date; e.g. 5/2025"
+                  },
+                  "number": {
+                    "type": "string",
+                    "description": "Card number"
+                  }
+                }
+              },
+              "clientRedirectUrl": {
+                "description": "URL to redirect to upon completed card payment",
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "SuccessResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
           },
           "message": {
             "type": "string"
           }
         }
-      }
+      },
+      "SuccessfulTokenResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SuccessResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "SuccessfulTransactionResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SuccessResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "00",
+                  "01",
+                  "02"
+                ]
+              },
+              "transactionId": {
+                "type": "string",
+                "description": "The ID of the performed transaction"
+              },
+              "date": {
+                "type": "string",
+                "description": "The `createdAt` timestamp of the transaction"
+              }
+            }
+          }
+        ]
+      },
+      "RetrievedTransactionResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SuccessResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "string",
+                "enum": [
+                  "00",
+                  "01",
+                  "02"
+                ]
+              },
+              "status": {
+                "type": "string",
+                "enum": [
+                  "paid",
+                  "pp",
+                  "failed"
+                ]
+              },
+              "transactionId": {
+                "type": "string",
+                "description": "The current transaction's ID"
+              },
+              "reference": {
+                "type": "string",
+                "description": "The current transaction's reference"
+              }
+            }
+          }
+        ]
+      },
+      "RetrievedAllTransactionsResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "code": {
+                  "type": "string",
+                  "enum": [
+                    "00",
+                    "01",
+                    "02"
+                  ]
+                },
+                "status": {
+                  "type": "string",
+                  "enum": [
+                    "paid",
+                    "pp",
+                    "failed"
+                  ]
+                },
+                "transactionId": {
+                  "type": "string",
+                  "description": "The current transaction's ID"
+                },
+                "reference": {
+                  "type": "string",
+                  "description": "The current transaction's reference"
+                }
+              }
+            }
+          }
+        }
+      },
+      "RetrievedBillersResponse": {
+        "type": "object",
+        "properties": {
+          "success": {
+            "type": "boolean"
+          },
+          "message": {
+            "type": "string"
+          },
+          "data": {
+            "type": "object",
+            "properties": {
+              "merchantId": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              },
+              "contactAddress": {
+              },
+              "contactEmail": {
+              },
+              "merchantLogo": {
+
+              },
+              "merchantDescription": {}
+            }
+          }
+        }
     },
-    "securitySchemes": {
-      "bearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
+    "Error": {
+      "required": [
+        "error",
+        "message"
+      ],
+      "type": "object",
+      "properties": {
+        "error": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        }
       }
     }
+  },
+  "securitySchemes": {
+    "bearerAuth": {
+      "type": "http",
+      "scheme": "bearer"
+    }
   }
+}
 }
