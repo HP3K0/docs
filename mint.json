@@ -54,7 +54,7 @@
       ]
     },
     {
-      "group": "Transaction Management",
+      "group": "Transaction management",
       "pages": [
         "api-reference/endpoint/get-transaction",
         "api-reference/endpoint/get-transactions"
