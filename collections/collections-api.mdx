@@ -1,0 +1,58 @@
+---
+title: Using the API
+icon: chevron-down
+description: Collecting money into a PeoplesPay account
+---
+
+Collections are the primary method to credit a PeoplesPay account. Money may be collected via mobile money or bank card.
+
+## Authentication
+The first step in a PeoplesPay collection is token generation. By calling the [/hub/token/get](/api-reference/endpoint/get-token) endpoint
+with the correct payload, the platform issues a time-limited access token that authorizes subsequent collections requests. This JWT access token
+encodes the merchant's `appId` and the type of operation.
+
+## Payment methods
+<Info>
+The request payload varies based on the collection's method of payment.
+    
+</Info>
+<AccordionGroup>
+<Accordion
+title="Mobile money"
+>
+ Mobile money collections have peculiar considerations. The exact flow looks something like this:
+ <Steps>
+    <Step title="Initialisation">
+        The collection is initialised as the POST request is sent to the momo collections [endpoint](/api-reference/endpoint/collect-momo).
+    </Step>
+    <Step title="Capture">
+        The PeoplesPay platform communicates with the corresponding network provider's servers to trigger an payment prompt on the payer's phone
+    </Step>
+    <Step title="Approval">
+        The payer approves (or declines) the payment
+    </Step>
+    <Step title="Notification">
+        The network provider's systems notify the PeoplesPay platform of the collection outcome
+    </Step>
+ </Steps>
+</Accordion>
+<Accordion
+title="Card"
+>
+ Collections performed by bank card are quite different to mobile money collections. The flow is as follows:
+ <Steps>
+    <Step title="Initialisation">
+        The collection is initialised as the POST request is sent to the card collections [endpoint](/api-reference/endpoint/collect-card).
+    </Step>
+    <Step title="Card scheme gateway">
+        The PeoplesPay platform communicates with a card scheme gateway to proceed
+    </Step>
+    <Step title="Approval">
+        The payer approves (or declines) the payment
+    </Step>
+    <Step title="Notification">
+        The network provider's systems notify the PeoplesPay platform of the collection outcome
+    </Step>
+ </Steps>
+</Accordion>
+</AccordionGroup>

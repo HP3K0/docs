@@ -42,6 +42,12 @@
       ]
     },
     {
+      "group": "Authentication",
+      "pages": [
+        "api-reference/endpoint/merchant-login"
+      ]
+    },
+    {
       "group": "Operations",
       "pages": [
         "api-reference/endpoint/get-token",
@@ -63,9 +69,21 @@
       ]
     },
     {
-      "group": "Bills",
+      "group": "Operations",
       "pages": [
-        "bills/introduction"
+        {
+          "group": "Collections",
+          "pages": [
+            "collections/collections-api",
+            "collections/collections-checkout"
+          ]
+        },
+        {
+          "group": "Bill Payments",
+          "pages": [
+            "bills/introduction"
+          ]
+        }
       ]
     },
     {

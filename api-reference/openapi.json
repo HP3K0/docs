@@ -200,6 +200,42 @@
           }
         }
       }
+    },
+    "/merchants/login": {
+      "post": {
+        "description": "Log in as merchant",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MerchantLogin"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logged in.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuccessfulMerchantLoginResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "unexpected error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -339,6 +375,17 @@
             }
           }
         ]
+      },
+      "MerchantLogin": {
+        "type": "object",
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
       },
       "SuccessResponse": {
         "type": "object",
@@ -491,40 +538,52 @@
               "name": {
                 "type": "string"
               },
-              "contactAddress": {
-              },
-              "contactEmail": {
-              },
-              "merchantLogo": {
-
-              },
+              "contactAddress": {},
+              "contactEmail": {},
+              "merchantLogo": {},
               "merchantDescription": {}
             }
           }
         }
-    },
-    "Error": {
-      "required": [
-        "error",
-        "message"
-      ],
-      "type": "object",
-      "properties": {
-        "error": {
-          "type": "integer",
-          "format": "int32"
-        },
-        "message": {
-          "type": "string"
+      },
+      "SuccessfulMerchantLoginResponse": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/SuccessResponse"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data": {},
+              "token": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "Error": {
+        "required": [
+          "error",
+          "message"
+        ],
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          }
         }
       }
-    }
-  },
-  "securitySchemes": {
-    "bearerAuth": {
-      "type": "http",
-      "scheme": "bearer"
+    },
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer"
+      }
     }
   }
-}
 }
