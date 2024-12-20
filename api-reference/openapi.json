@@ -203,6 +203,9 @@
     },
     "/merchants/login": {
       "post": {
+        "security": [
+          {}
+        ],
         "description": "Log in as merchant",
         "requestBody": {
           "content": {
