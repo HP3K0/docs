@@ -1,0 +1,24 @@
+---
+title: "Merchant Authentication"
+description: "Accessing the API as a merchant"
+---
+
+Merchant authentication on the PeoplesPay platform is very straightforward. The only two things to keep in mind is that
+API keys are used to initiate transactions, and pretty much anything else is accessed by using the `token` returned
+upon merchant login.
+
+## Merchant login
+The vast majority of merchant operations (bar transaction initiation) are completed by the [merchant portal](https://merchants.peoplespay.com.gh).
+Logging into the portal requires the email address used when onboarding, and your password. A login session can be created programmatically
+by calling the [`/login`](/api-reference/endpoint/merchant-login) endpoint with a POST request containing the `email` and `password`. The returned
+`token` expires after 30 minutes.
+
+## Token generation for transactions
+Transaction initiation, whether for a `DEBIT` or `CREDIT` requires the creation of a separate access token. The type of transaction you wish
+to initiate will determine the operation to specify in the POST request payload. A *collection* i.e. receiving money from a customer requires
+specifying `DEBIT` in the payload, whilst a *disbursement* i.e. sending money to a customer requires `CREDIT` to be specified. By default, the
+`operation` when calling the [/hub/token/get](/api-reference/endpoint/get-token) endpoint is set to `DEBIT`.
+<Note>
+    Keep in mind that not all merchants can perform disbursements. For such merchants, using an `operation` value of `CREDIT` will cause the server
+    to raise an error.
+</Note>

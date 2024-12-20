@@ -36,6 +36,36 @@
       ]
     },
     {
+      "group": "Authentication",
+      "pages": [
+        "/authentication/merchants"
+      ]
+    },
+    {
+      "group": "Operations",
+      "pages": [
+        {
+          "group": "Collections",
+          "pages": [
+            "collections/collections-api",
+            "collections/collections-checkout"
+          ]
+        },
+        {
+          "group": "Bill Payments",
+          "pages": [
+            "bills/introduction"
+          ]
+        }
+      ]
+    },
+    {
+      "group": "USSD",
+      "pages": [
+        "ussd/subscriptions"
+      ]
+    },
+    {
       "group": "API Documentation",
       "pages": [
         "api-reference/introduction"
@@ -66,30 +96,6 @@
       "group": "Bill payments",
       "pages": [
         "api-reference/endpoint/get-billers"
-      ]
-    },
-    {
-      "group": "Operations",
-      "pages": [
-        {
-          "group": "Collections",
-          "pages": [
-            "collections/collections-api",
-            "collections/collections-checkout"
-          ]
-        },
-        {
-          "group": "Bill Payments",
-          "pages": [
-            "bills/introduction"
-          ]
-        }
-      ]
-    },
-    {
-      "group": "USSD",
-      "pages": [
-        "ussd/subscriptions"
       ]
     }
   ],
