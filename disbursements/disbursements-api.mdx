@@ -1,0 +1,30 @@
+---
+title: Using the API
+icon: link
+description: Disburse money from a PeoplesPay account
+---
+
+Disbursements are one of the ways you can send money from your PeoplesPay account. You can disburse money into bank accounts and mobile money wallets.
+
+## Authentication
+Much like a collection, the first step in a PeoplesPay disbursement is token generation. Call the [/hub/token/get](/api-reference/endpoint/get-token) endpoint
+with the appropriate payload to retrieve time-limited access token that authorizes subsequent disbursement requests. This JWT access token
+encodes the merchant's `appId` and the type of operation.
+
+
+## Performing the disbursement
+ Disbursement flow is as follows:
+ <Steps>
+    <Step title="Initialisation">
+        The disbursement is initialised as the POST request is sent to the corresponding [endpoint](/api-reference/endpoint/disburse).
+    </Step>
+    <Step title="Validation">
+        The source account is validated, with checks performed on its access, existence and balance.
+    </Step>
+    <Step title="Routing">
+        The PeoplesPay platform routes the transaction to the specified destination
+    </Step>
+    <Step title="Completion">
+        The disbursement transaction is either resolved (status=`paid` or status=`failed`) or pending.
+    </Step>
+ </Steps>

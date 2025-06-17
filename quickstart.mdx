@@ -16,32 +16,141 @@ This quickstart outlines these operations via the PeoplesPay API, so you will ne
   </Accordion>
 </AccordionGroup>
 
-## Collecting money
-Collections are the primary method to credit a PeoplesPay account (used interchangeably with *wallet*). Collections involve the transfer of money from an external account, either a mobile money wallet or a bank card, to a specified PeoplesPay account.
-Virtually all PeoplesPay accounts can perform collections, which isn't the case for disbursements. A collection is a type of *transaction*; on the merchant portal, collections have a `transactionType` of `RM`. 
+## Defining terms
+Before we continue, let us define a few terms:
+|Term|Meaning|
+|---|---|
+|Customer|The other party you complete an operation with (payer or recipient)
+|Collection|An operation involving money being debited (taken) from a customer
+|Disbursement|An operation involving money being credited (sent) to a customer
+|Merchant|A user registered on PeoplesPay that performs collections and disbursements
+|Wallet|Where money is stored, sent from or sent to
 
-<Note>
-  If you cannot perfom a collection, and your account has not been disabled, try contacting [support](mailto:info@peoplespay.com.gh). 
-</Note>
+## Generate an access token
+The first step to performing collections and/or disbursements on PeoplesPay is to generate an access token. These will be passed in the HTTP Authorization as a Bearer value. 
 
-<Steps>
-  <Step title="Request a collections access token">
-    Send a POST request to generate an access token to perform a collection. Specify the `merchantId`, `apikey` and `operation` in the request body.
-  </Step>
-  <Step title="Perform a collections request">
-    Send a POST request containing all required information for the collections transaction.
-  </Step>
-  <Step title="Authorize payment (non-card)">
-    The customer authorizes payment.
-  </Step>
-  <Step title="Verify">
-    Check your PeoplesPay account balance and transaction history for the relevant collections transaction. The initial status of the transaction will be **pending**, which is eventually resolved to **paid** or **failed**.
-  </Step>
-</Steps>
+You issue an unauthenticated `POST` request to the `/hub/token/get` endpoint
 
-## Disbursing money
-Disbursements are very similar to collections. The main steps are the same, and the outcome is the same. The following points are of note, however:
-- **failed** disbursements will result in a balance deduction by the corresponding transaction amount.
-- access to disbursement is not available to all PeoplesPay accounts. If this is the case for you, reach out to support.
-- disbursements can be performed into mobile money wallets and/or bank accounts.
+```plaintext
+curl
+--location 'https://peoplespay.com.gh/peoplepay/hub/token/get' \
+--header 'Content-Type: application/json' \
+--data '{
+    "merchantId": "63b59e40530000aec59a049f",
+    "apikey": "93060047-0000-0000-0000-4dee28773a86"
+}'
+```
 
+The collection request includes three fields, with one being optional: `merchantId`, `apikey` and `operation`. `operation` has a default value of `DEBIT`, which refers to the debit of a customer’s account to credit a merchant.
+
+The response returns an access token valid for 30 minutes
+```json
+{
+    "success": true,
+    "message": "Token generated successfully",
+    "data": "eyJhbGciOiJIUzUxMiIsInR5cCI6IkpYVCJ9.eyJhcHBJZCI6IjY0MGFmZFE0NzA3MDBlZDdjYWE4ZDU5OSIsIm9wZXJhdGlvbiI6IkRFQklUIiwibGFzdHNlZW4iOiIyMDIzLTAzLTEwVDA5OjUxOjMyLjIyMFoiLCJpYXQiOjE3MzgzNzkzMzUsImV4cCI6MTczODM0MjkzNX0.2s2LpPrkLt5VF0bYR_vtrAhChxEkizLB61Ugqiz58r3yRVb9HeEJ7eJ0jOzwzHUdjgtslprbQHacPvwnw9aOHQ"
+}
+```
+
+
+## Initiate collection request
+To initiate a collection via mobile money (check the Collections page for collecting from bank cards), you must specify the customer’s mobile network, their phone number along with the amount you’d like to collect. You can pass a custom transaction ID to track your operation, along with a URL to receive a webhook notification when the transaction status resolves.
+
+```plaintext
+curl 
+--location 'https://peoplespay.com.gh/peoplepay/hub/collectmoney' \
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpYVCJ9.eyJhcHBJZCI7IjY0MGFmZFE0NzA3MDBlZDdjYWE4ZDU5OSIsIm9wZXJhdGlvbiI6IkRFQklUIiwibGFzdHNlZW4iOiIyMDIzLTAzLTEwVDA5OjUxOjMyLjIyMFoiLCJpYXQiOjE3MzgzNzkzMzUsImV4cCI6MTczODM0MjkzNX0.2s2LpPrkLt5VF0bYR_vtrAhChxEkizLB61Ugqiz58r3yRVb9HeEJ7eJ0jOzwzHUdjgtslprbQHacPvwnw9aOHQ' \
+--data '{
+    "amount":1.2,
+    "account_name":"1738340456",
+    "account_number": "0553142293",
+    "account_issuer": "mtn",
+    "description": "test payment1",
+    "callbackUrl": "https://webhook.site/0d511110-0ab1-40d3-be91-31a74bd592a5",
+    "externalTransactionId": "running-a-test-on-1738340456"
+    
+}'
+```
+
+For a successfully initiated transaction, the response is as follows:
+```json
+{
+    "code": "01",
+    "success": true,
+    "message": "Transaction Recieved for Processing",
+    "transactionId": "67a0ea4c298ab35d935ae468",
+    "date": "2025-02-03T16:09:48.884Z",
+    "externalTransactionId": "running-a-test-on-1738598989"
+}
+```
+
+As this collection will be performed via the mobile money channel, the `account_number` will receive a USSD prompt to authorize the payment.
+
+## Check transaction status 
+Though a webhook notification will be sent to the provided callbackUrl , you can still manually check the status of a transaction.
+```plaintext
+curl 
+--location 'https://peoplespay.com.gh/peoplepay/hub/transactions/get/67a0ea4c298ab35d935ae468'
+--header 'Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJtZXJjaGFudElkIjoiNjNiNTllNDE1MzBhZWVhZWM1OWEwNDYxIiwiZW1haWwiOiJrd2FzaS5vd3VzdUBic3lzdGVtc2xpbWl0ZWQuY29tIiwiY3JlYXRlZEF0IjoxNzM4NTk5Njk3NjEwLCJpYXQiOjE3Mzg1OTk2OTcsImV4cCI6MTczODYwMzI5N30.ZS5i8Ai5ZaBSp5y7vZk928uu1pP7SOInUIGFit4Qoa-LQKUqyub1CvVEGNdINwrFLUEY8BwZe4nedJ40IZPGLw'
+```
+
+
+```json
+{
+    "success": true,
+    "code": "02",
+    "message": "COULD_NOT_PERFORM_TRANSACTION",
+    "status": "failed",
+    "transactionId": "67a0ba4c298ab35d935ae468",
+    "reference": "000002434923"
+}
+```
+
+## Bonus: disburse money
+If the collection was successful, you’ll be able to perform a disbursement; this operation moves money from your PeoplesPay wallet to a mobile money wallet or a bank account.
+
+As with collections, the first step is to generate an access token to perform the operation:
+```plaintext
+curl
+--location 'https://peoplespay.com.gh/peoplepay/hub/token/get' \
+--header 'Content-Type: application/json' \
+--data '{
+    "merchantId": "63b59e40530000aec59a049f",
+    "apikey": "93060047-0000-0000-0000-4dee28773a86",
+    "operation": "CREDIT"
+}'
+```
+Note the value of the operation field; it must be set to CREDIT, to perform a disbursement. Then, use the returned token for the following request:
+
+```plaintext
+curl 
+--location 'https://peoplespay.com.gh/peoplepay/hub/disburse'
+--header 'Content-Type: application/json' \
+--header 'Authorization: Bearer eyJhbGciOwJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJhcHBJZCI6IjY0MGnmZGE0NzA3NDBlZDdjYWE4ZDU5OSIsIm9wZXJhdGlvbiI6IkNSRURJVCIsImxhc3RzZWVuIjoiMjAyMy0wMy0xMFQwOTo1MTozMi4yMjBaIiwiaWF0IjoxNzMzMDIyMjUxLCJleHAiOjE3MzMwMjU4NTF9.gmCCwfnFsxmEtO19EOu69Bb2qUSOD9pzvxmyEazolyT_nM3xrt-Mc6G6l6W7jQJVDt1wALYv3hIFhe-O7VpX0g' \
+--data '{
+    "amount":0.1,
+    "account_number": "0500720780",
+    "account_name": "unknown",
+    "account_issuer": "vodafone",
+    "description":"test",
+    "externalTransactionId": "123345",
+    "account_type": "momo"
+}'
+```
+
+The example above would send money to a mobile money account. If successful, the repsonse would look something like this:
+
+```json
+{
+    "code": "00",
+    "success": true,
+    "message": "Transaction received and being processed",
+    "transactionId": "67a0f8c10583b4700901ce30",
+    "date": "2025-02-03T17:11:29.037Z",
+    "externalTransactionId": "123345"
+}
+```
+
+## Next steps
+Great stuff! If all the steps were successful, you should have some money in your PeoplesPay wallet. You’ll be able to see transaction history on the merchant portal, detailed transaction information, and much more. By now, you ought to have a basic understanding of the main operations on PeoplesPay. Go look at the HTTP requests with their corresponding endpoints in the reference.

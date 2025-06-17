@@ -1,0 +1,465 @@
+openapi: 3.0.1
+info:
+  title: PeoplesPay API Documentation
+  description: PeoplesPay API endpoints, payloads and relevant notes.
+  license:
+    name: MIT
+  version: 1.0.0
+servers:
+  - url: https://peoplespay.com.gh/peoplepay
+security: []
+paths:
+  /hub/token/get:
+    post:
+      summary: Get a token
+      description: Returns a token for an operation (collection or disbursement)
+      security: []
+      requestBody:
+        description: Specifed operation for given merchant and API user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TypeOfTransactionToken'
+        required: true
+      responses:
+        '200':
+          description: Token generation response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessfulTokenResponse'
+        '400':
+          description: Unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /hub/collectmoney:
+    post:
+      summary: Collect money (via momo)
+      description: Initiates a request to pay, sent to the specified mobile number
+      security:
+        - operationAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MomoCollections'
+      responses:
+        '200':
+          description: Response for successfully received request to collect
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessfulTransactionResponse'
+  /hub/collectmoney/card:
+    post:
+      summary: Collect money (via card)
+      description: Initiates a request to pay, to the provided bank card
+      security:
+        - operationAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CardCollections'
+      responses:
+        '200':
+          description: Response for successfully received request to collect
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessfulTransactionResponse'
+  /hub/disburse:
+    post:
+      summary: Disburse money
+      description: Initiates a disbursement request (to phone number or bank account)
+      security:
+        - operationAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Disbursements'
+      responses:
+        '200':
+          description: Response for successfully received request to disburse
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessfulTransactionResponse'
+  /merchants/login:
+    post:
+      security: []
+      summary: Log in (merchant)
+      description: Log in as merchant
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/MerchantLogin'
+      responses:
+        '200':
+          description: Logged in.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessfulMerchantLoginResponse'
+        '400':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /hub/transactions/get/{id}:
+    get:
+      description: Retrieves a transaction based on the supplied ID
+      summary: Get transaction by ID
+      security:
+        - adminAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of transaction to retrieve
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transaction retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrievedTransactionResponse'
+        '400':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /hub/summary/filter:
+    get:
+      summary: Get transaction history
+      description: Retrieves transaction history for current merchant
+      security:
+        - adminAuth: []
+      parameters:
+        - name: id
+          in: query
+          description: ID of the merchant account
+          required: true
+          schema:
+            type: string
+        - name: startDate
+          in: query
+          description: Start date of transaction history filter
+          required: true
+          schema:
+            type: string
+        - name: endDate
+          in: query
+          description: End data of transaction history filter
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Transactions retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrievedAllTransactionsResponse'
+        '400':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /hub/merchants/itc/get:
+    get:
+      summary: Get billers
+      description: Retrieves all billers.
+      security:
+        - adminAuth: []
+      responses:
+        '200':
+          description: Billers retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrievedBillersResponse'
+        '400':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+components:
+  schemas:
+    TransactionToken:
+      required:
+        - merchantId
+        - apikey
+      type: object
+      properties:
+        merchantId:
+          description: The merchant's merchantId
+          type: string
+        apikey:
+          description: The apikey for the app to collect through
+          type: string
+    TypeOfTransactionToken:
+      allOf:
+        - $ref: '#/components/schemas/TransactionToken'
+        - required:
+            - operation
+          type: object
+          properties:
+            operation:
+              description: The kind of operation to perform
+              type: string
+              enum:
+                - DEBIT
+                - CREDIT
+    Collections:
+      required:
+        - amount
+        - account_name
+        - description
+        - callbackUrl
+      type: object
+      properties:
+        amount:
+          description: Total amount to collect
+          type: number
+          format: float
+        account_name:
+          description: Account holder name
+          type: string
+        description:
+          description: Brief description of the transaction
+          type: string
+        callbackUrl:
+          type: string
+          description: The URL that will receive webhook containing transaction status.
+    MomoCollections:
+      allOf:
+        - $ref: '#/components/schemas/Collections'
+        - required:
+            - account_number
+            - account_issuer
+          type: object
+          properties:
+            account_number:
+              description: Account number
+              type: string
+            account_issuer:
+              description: Account number's network provider
+              type: string
+              enum:
+                - mtn
+                - vodafone
+                - airteltigo
+    CardCollections:
+      allOf:
+        - $ref: '#/components/schemas/Collections'
+        - required:
+            - card
+            - clientRedirectUrl
+          type: object
+          properties:
+            card:
+              description: Object containing card details
+              type: object
+              properties:
+                cvc:
+                  type: string
+                  maximum: 3
+                  description: Security code
+                expiry:
+                  type: string
+                  description: Card expiry date; e.g. 5/2025
+                number:
+                  type: string
+                  description: Card number
+            clientRedirectUrl:
+              description: URL to redirect to upon completed card payment
+              type: string
+    Disbursements:
+      required:
+        - amount
+        - account_name
+        - description
+        - account_number
+        - account_issuer
+        - account_type
+      type: object
+      properties:
+        amount:
+          description: Total amount to disburse
+          type: number
+          format: float
+        account_name:
+          description: Account holder name
+          type: string
+        description:
+          description: Brief description of the transaction
+          type: string
+        callbackUrl:
+          type: string
+          description: The URL that will receive webhook containing transaction status.
+        account_number:
+          type: string
+          description: The recipient's account number (phone number or bank account)
+        externalTransactionId:
+          type: string
+          description: Custom transaction ID to track transaction
+          required: ['false']
+        account_issuer:
+          type: string
+          description: Institution the recipient's account belongs to
+          enum:
+            - mtn
+            - vodafone
+            - airteltigo
+        account_type:
+          type: string
+          description: The type of account; momo or bank
+          enum:
+            - bank
+            - momo
+    MerchantLogin:
+      type: object
+      properties:
+        email:
+          type: string
+        password:
+          type: string
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+    SuccessfulTokenResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: string
+    SuccessfulTransactionResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            code:
+              type: string
+              enum:
+                - '00'
+                - '01'
+                - '02'
+            transactionId:
+              type: string
+              description: The ID of the performed transaction
+            date:
+              type: string
+              description: The `createdAt` timestamp of the transaction
+    RetrievedTransactionResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            code:
+              type: string
+              enum:
+                - '00'
+                - '01'
+                - '02'
+            status:
+              type: string
+              enum:
+                - paid
+                - pp
+                - failed
+            transactionId:
+              type: string
+              description: The current transaction's ID
+            reference:
+              type: string
+              description: The current transaction's reference
+    RetrievedAllTransactionsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: array
+          items:
+            type: object
+            properties:
+              code:
+                type: string
+                enum:
+                  - '00'
+                  - '01'
+                  - '02'
+              status:
+                type: string
+                enum:
+                  - paid
+                  - pp
+                  - failed
+              transactionId:
+                type: string
+                description: The current transaction's ID
+              reference:
+                type: string
+                description: The current transaction's reference
+    RetrievedBillersResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            merchantId:
+              type: string
+            name:
+              type: string
+            contactAddress: {}
+            contactEmail: {}
+            merchantLogo: {}
+            merchantDescription: {}
+    SuccessfulMerchantLoginResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data: {}
+            token:
+              type: string
+    Error:
+      required:
+        - error
+        - message
+      type: object
+      properties:
+        error:
+          type: integer
+          format: int32
+        message:
+          type: string
+  securitySchemes:
+    adminAuth:
+      type: http
+      scheme: bearer
+    operationAuth:
+      type: http
+      scheme: bearer

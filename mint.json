@@ -36,9 +36,16 @@
       ]
     },
     {
+      "group": "Concepts",
+      "pages": [
+        "concepts/transactions",
+        "concepts/merchants"
+      ]
+    },
+    {
       "group": "Authentication",
       "pages": [
-        "/authentication/merchants"
+        "authentication/merchants"
       ]
     },
     {
@@ -52,17 +59,18 @@
           ]
         },
         {
+          "group": "Disbursements",
+          "pages": [
+            "disbursements/disbursements-api",
+            "disbursements/disbursements-portal"
+          ]
+        },
+        {
           "group": "Bill Payments",
           "pages": [
             "bills/introduction"
           ]
         }
-      ]
-    },
-    {
-      "group": "USSD",
-      "pages": [
-        "ussd/subscriptions"
       ]
     },
     {
@@ -82,7 +90,8 @@
       "pages": [
         "api-reference/endpoint/get-token",
         "api-reference/endpoint/collect-momo",
-        "api-reference/endpoint/collect-card"
+        "api-reference/endpoint/collect-card",
+        "api-reference/endpoint/disburse"
       ]
     },
     {

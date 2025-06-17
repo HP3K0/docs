@@ -1,0 +1,53 @@
+---
+title: 'Transactions'
+icon: bills
+description: 'Understand how transactions work'
+---
+
+
+Transactions are crucially important, in the PeoplesPay ecosystem. Collections, disbursements and the like are all transactions. This page will outline some things to know when interacting with them.
+
+## Types of transactions
+
+There are several different types of transactions within the PeoplesPay platform, but you will largely interact with collections and disbursements. These have `transactionType` values of `RM` and `SM` , respectively.
+
+## Viewing transaction data
+
+Transaction data is viewable via the merchant portal, via the API and when receiving webhook notifications.
+
+## Viewing transaction data on the merchant portal
+
+When accessing the merchant portal, you will the most recent transactions on the dashboard, when logging in. For any transaction, bring up the details by clicking on the eye icon
+
+![image](/images/merchant-1.png)
+This will open a modal containing in-depth transaction information
+
+## Accessing transaction data programmatically
+To access in-depth transaction data via the API, call the `/transactions/get/{transactionId}` `GET` endpoint
+```plaintext
+curl 
+--location 'https://peoplespay.com.gh/peoplepay/transactions/get/65673d042f1c500089973db6' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzUxMiXsInR5cCI6IkpXVCJ9.eyJtZXJjaGFJdElkIjoiNjNiNTllNDE1MzBhZWVhZWM1OWEwNDYxIiwiZW1haWwiOiJrd2FzaS5vd3VzdUBic3lzdGVtc2xpbWl0ZWQuY29tIiwiY3JlYXRlZEF0IjoxNzM4NjA1ODUyMDQ2LCJpYXQiOjE3Mzg2MDU4NTIsImV4cCI6MTczODYwOTQ1Mn0.kBz4c2ZbVmuMI1PeukZDpXWRfdtCrazKMgaDFrjDT7xcKtbMjA6iyTcG6WSLwzTtuuEYITeINV1Sz8V9JJrw7g'
+```
+
+## Transaction history
+
+Accessing data for a single transaction is good, but often this must be done for many transactions at once, either for a day or more than a day. Given the nature of financial transactions, this data can quickly reach large sizes and start getting unwieldy, especially if you have high transaction volume, or are seeking to gather data over a large time frame. As such, we strongly recommend you access transaction history via the merchant portal. 
+
+## Accessing transaction history via the merchant portal
+
+Get onto the All transactions page, and proceed to enter your date range using the date fields. Once you click Filter transaction, the platform will consolidate all your transactions and present them in the datatable on the same page. You can export the data by using the Download report function. If the transaction count for the selected date range exceeds 20,000, the rest of the records will be hidden from view. In such cases, downloading the report is the preferred option, as the generated CSV file will contain all transactions for that date range.
+
+<Warning>
+    If you run into repeated timeout errors when trying to view transaction history, it may be that the transaction count for the selected date range is too large. Either reduce your date range to chunk the request, or reach out to support for large-scale bulk transaction history.
+</Warning>
+
+## Accessing transaction history via the API
+To obtain transaction history programmatically, call the `/hub/summary/filter` `GET` endpoint and pass in the required parameters
+```plaintext
+curl
+--location 'https://peoplespay.com.gh/peoplepay/hub/summary/filter?id=63b59e41530aeeaec59a045f&startDate=10%2F1%2F2024&endDate=10%2F31%2F2024' \
+--header 'Authorization: Bearer eyJhbGciOiJIUzUxMiIsInR5cCI6IkpXVCJ9.eyJtZXJjaGFudElkIjoiNjNiNTllNDE1MzBhZWVhZWM1OWEwNDYxIiwiZW1haWwiOiJrd2FzaS5vd3VzdUBic3lzdGVtc2xpbWl0ZWQuY29tIiwiY3JlYXRlZEF0IjoxNzM4NjA1ODUyMDQ2LCJpYXQiOjE3Mzg2MDU4NTIsImV4cCI6MTczODYwOTQ1Mn0.kBz4c2ZbVmuMI1PeukZDpXWRfdtCrazKMgaDFrjDT7xcKtbMjA6iyTcG6WSLwzTtuuEYITeINV1Sz8V9JJrw7g'
+```
+
+The response will return transaction history as an array of objects in JSON format.
