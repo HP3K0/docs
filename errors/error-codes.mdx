@@ -1,0 +1,119 @@
+---
+title: 'Error codes'
+icon: circle-x
+description: 'Reference for error codes'
+---
+
+Payments will sometimes fail, whether for collections or disbursements.
+
+## Collections
+
+Transaction failures for collections will vary by payment channel. 
+
+### MTN Mobile Money
+|Error message|Description|Suggested action|
+|---|---|---|
+|COULD_NOT_PERFORM_TRANSACTION|Transaction not completed, likely due to approval timeout.|Debit transactions have a 5-minute approval window. If the transaction times out, please retry the transaction to complete the debit|
+|LOW_BALANCE_OR_PAYEE_LIMIT_ REACHED_OR_NOT_ALLOWED|A combination error, that largely covers insufficient wallet balance.|Retry the transaction; if the error persists, reach out to PeoplesPay support.|
+|INTERNAL_PROCESSING_ERROR|This is a default or generic error code used when there is no specific error mapping. This predominantly occurs due to insufficient customer funds to complete the transaction. Also related to service denied or Wallet Platform is not reachable.| Retry the transaction, if possible.|
+|NOT_ENOUGH_FUNDS|The payer does not have enough funds.|
+|SENDER_ACCOUNT_NOT_ACTIVE|The MoMo wallet used for the transfer has not been activated.|Please contact MTN support to activate the wallet for transactions|
+|PAYEE_NOT_FOUND|PeoplesPay OVA is temporarily unavailable.|This error generated when the business account is blocked or otherwise unavailable. Retry the transaction, or contact support.|
+
+
+### Telecel Cash
+|Error code|Description|Suggested action|
+|---|---|---|
+|INS-1|Internal Error|Re-attempt the collection. If the error persists, contact support.|
+|INS-6|Transaction Failed|Re-attempt the collection. If the error persists, contact support.|
+|INS-9|Request timeout|The payment request timed out; customers must approve the transaction in time, to complete a collection.|
+|INS-15|Invalid Amount Used|Review the collection amount stated in the request, and re-attempt the collection.|
+|INS-990|Customer Transaction Value Limit Breached|Customer wallets have a maximum daily limit for transaction value; limit has been reached.|
+|INS-991|Customer Transaction Count Limit Breached|Customer wallets have a maximum daily limit for transaction count; limit has been reached.|
+|INS-992|Multiple Limits Breached| More than one limit has been reached, for a customer's wallet.|
+|INS-2006|Insufficient balance| Customer wallet does not have enough funds to complete the collection.|
+|INS-2051|MSISDN invalid.|The phone number used for the collection is invalid. Check the number and re-attempt.|
+## Disbursements
+Currently, disbursements through the PeoplesPay platform are routed through GhIPSS. Error codes are as follows:
+
+|Error code|Description|Suggested action|
+|---|---|---|
+|001|Approved with ID|-|
+|003|Approved VIP|-|
+|007|Approved update chip|-|
+|091|Institution unavailable|-|
+|100|Rejected|Re-attempt the disbursement. If the error persists, contact support.|
+|101|Expired card|-|
+|102|Suspected fraud|-|
+|104|Private card|-|
+|106|Allowable number on PIN entry tries exceeded|-|
+|107|Refer to card issuer|-|
+|108|Refer to card issuer; special condition|-|
+|109|Bad merchant|-|
+|110|Invalid amount|-|
+|111|Invalid card number|-|
+|112|PIN element required for this transaction type|-|
+|114|Unknown card|-|
+|115|Function not available|-|
+|116|No sufficient funds|-|
+|117|Incorrect PIN|-|
+|118|No such card|-|
+|119|Cardholder transaction not permitted|-|
+|120|Terminal transaction not permitted|-|
+|121|Exceeds withdrawal frequency limit|-|
+|122|Security violation|-|
+|123|Withdrawal frequency exceeded|-|
+|125|Card not in service|-|
+|126|Wrong PIN format|-|
+|127|Error PIN length|-|
+|128|Cryptographic error|-|
+|129|Suspected fraud|-|
+|180|No Credit account|-|
+|181|No cheque account|-|
+|182|No saving Account|-|
+|183|Bad CVV|-|
+|184|Invalid date|-|
+|200|Rejected, Pick up card|-|
+|201|Expired card, Pick up card|-|
+|202|Fraud suspected , Pick up card|-|
+|204|Reserved usage, Pick up card|-|
+|205|Issuer call for Acquirer security service, pick up card|-|
+|206|Number of PIN validation attempts exceeded|-|
+|206|Card lost, Pick up|-|
+|207|Special conditions, Pick up card|-|
+|209|Card stolen, Pick up|-|
+|210|Fraud suspected, Pick up|-|
+|280|Alternative Amount reversed|-|
+|299|Card pick up|-|
+|300|Successfully processed|-|
+|301|Not supported by receiver|-|
+|302|Unable to find record in the file|-|
+|303|Duplicate record. Old record replaced.|-|
+|304|Zone control error|-|
+|305|File locked|-|
+|306|Unsuccessful|-|
+|307|Format error|-|
+|308|Duplicate record. New record rejected|Re-attempt the disbursement.|
+|309|File unknown|-|
+|381|Record not found|-|
+|382|Balance record cleared|-|
+|383|Balance request|-|
+|385|Reversal accepted|-|
+|480|Reversal accepted|-|
+|481|Invalid reversal amount|-|
+|503|Counters not available|-|
+|581|Reconciliation done|-|
+|582|Reconciliation process not available|-|
+|800|Cut-off in progress|-|
+|880|Connection not accepted|-|
+|902|Invalid transaction|-|
+|908|Transaction receiver not referenced for switch|-|
+|909|System defect|Transaction has been received by GhIPSS and is pending. Await status resolution. If this code is still returned 2 hours after initiating the disbursement, contact support.|
+|911|Timeout|Re-attempt the disbursement.|
+|912|Card issuer, Issuer institution or Telco institution not available|Transaction has been received by GhIPSS and is pending. Await status resolution. If this code is still returned 2 hours after initiating the disbursement, contact support.||
+|990|Transaction status unknown|Transaction has been received by GhIPSS and is pending. Await status resolution. If this code is still returned 2 hours after initiating the disbursement, contact support.|
+|992|Issuer not found|-|
+|993|PIN verification error|-|
+|994|Transaction processing error|Review the request payload, then re-attempt the disbursement; if the error persists, contact support.|
+|995|Server processing error|Review the request payload, then re-attempt the disbursement; if the error persists, contact support.|
+|999|Validation error|There has been an error validating the transaction. Re-attempt transaction or contact support.|

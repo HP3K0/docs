@@ -74,6 +74,12 @@
       ]
     },
     {
+      "group": "Errors",
+      "pages": [
+        "errors/error-codes"
+      ]
+    },
+    {
       "group": "API Documentation",
       "pages": [
         "api-reference/introduction"
@@ -107,10 +113,5 @@
         "api-reference/endpoint/get-billers"
       ]
     }
-  ],
-  "footerSocials": {
-    "x": "https://x.com/mintlify",
-    "github": "https://github.com/mintlify",
-    "linkedin": "https://www.linkedin.com/company/mintsearch"
-  }
+  ]
 }
