@@ -194,6 +194,108 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /webhooks/get/{id}:
+    get:
+      summary: Get webhook event
+      description: Retrieves a webhook event
+      security:
+        - adminAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of the event
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Webhook event retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RetrievedEventResponse"
+        '500':
+          description: Webhook event error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventError'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /webhooks/get/{merchant}/{page}:
+    get:
+      summary: Get all webhook events
+      description: Retrieves all webhook events for a merchant
+      security:
+        - adminAuth: []
+      parameters:
+        - name: merchant
+          in: path
+          description: Merchant ID
+          required: true
+          schema:
+            type: string
+        - name: page
+          in: path
+          description: Page of response
+          required: true
+          schema:
+            type: number
+      responses:
+        '200':
+          description: Webhook events retrieved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RetrievedEventsResponse"
+        '500':
+          description: Webhook event error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventError'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /webhooks/fire/{id}:
+    get:
+      summary: Fire webhook event
+      description: Fires a webhook event delivery
+      security:
+        - adminAuth: []
+      parameters:
+        - name: id
+          in: path
+          description: ID of the event
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Webhook event delivery initiated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/FiredEventResponse"
+        '500':
+          description: Webhook event error.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventError'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
 components:
   schemas:
     TransactionToken:
@@ -242,6 +344,9 @@ components:
         callbackUrl:
           type: string
           description: The URL that will receive webhook containing transaction status.
+        externalTransactionId:
+          type: string
+          description: Optional ID the requester can pass in to track the transaction
     MomoCollections:
       allOf:
         - $ref: '#/components/schemas/Collections'
@@ -293,6 +398,7 @@ components:
         - account_number
         - account_issuer
         - account_type
+        - callbackUrl
       type: object
       properties:
         amount:
@@ -314,7 +420,6 @@ components:
         externalTransactionId:
           type: string
           description: Custom transaction ID to track transaction
-          required: ['false']
         account_issuer:
           type: string
           description: Institution the recipient's account belongs to
@@ -445,6 +550,101 @@ components:
             data: {}
             token:
               type: string
+    RetrievedEventResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+        data:
+          type: object
+          properties:
+            _id:
+              type: string
+            eventType:
+              type: string
+            createdAt:
+              type: string
+            eventData: {}
+            deliveryStatus: 
+              type: string
+              enum:
+                - DELIVERY_ATTEMPTED
+                - DELIVERED
+                - FAILED
+                - AWAITING_DELIVERY
+            destination:
+              type: string
+            customerId:
+              type: string
+            customerType:
+              type: string
+              enum:
+                - merchants
+                - customer
+            lastAttemptedAt:
+              type: string
+            numberOfAttempts:
+              type: integer
+              format: int32
+    RetrievedEventsResponse:
+      type: array
+      items:
+        type: object
+        properties:
+          success:
+            type: boolean
+          message:
+            type: string
+          data:
+            type: object
+            properties:
+              _id:
+                type: string
+              eventType:
+                type: string
+              createdAt:
+                type: string
+              eventData: {}
+              deliveryStatus: 
+                type: string
+                enum:
+                  - DELIVERY_ATTEMPTED
+                  - DELIVERED
+                  - FAILED
+                  - AWAITING_DELIVERY
+              destination:
+                type: string
+              customerId:
+                type: string
+              customerType:
+                type: string
+                enum:
+                  - merchants
+                  - customer
+              lastAttemptedAt:
+                type: string
+              numberOfAttempts:
+                type: integer
+                format: int32
+    FiredEventResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
+    EventError:
+      required:
+        - error
+        - message
+      type: object
+      properties:
+        success:
+          type: boolean
+        message:
+          type: string
     Error:
       required:
         - error
