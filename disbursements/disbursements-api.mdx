@@ -28,3 +28,28 @@ encodes the merchant's `appId` and the type of operation.
         The disbursement transaction is either resolved (status=`paid` or status=`failed`) or pending.
     </Step>
  </Steps>
+
+## Event notification
+Unlike [collections](/collections/), disbursements are currently synchronous requests, so the immediate HTTP response indicates whether the disbursement succeeded, failed or is pending.
+
+Pending disbursement transactions will have their statuses periodically checked. When the transaction status is updated, a notification will be delivered to the supplied webhook endpoint, which is the URL passed in the `callbackUrl` field. The HTTP notification will have the following structure:
+```json
+{
+  "eventId": "68a36233b0bab4e3f5ccc000",
+  "transactionId": "68a36227b0bab4e3f5bbb000",
+  "amount": 10,
+  "status": "paid",
+  "date": "2025-01-01T18:00:00.500Z",
+  "message": "Transaction processed successfully",
+  "success": true
+}
+```
+
+<Warning>
+    Without providing a `callbackUrl`, you will not receive webhook notifcations. Ensure your request payload includes that field.
+</Warning>
+
+The supplied `callbackUrl` must return an HTTP `200` response upon receiving the notification above, so the PeoplesPay platform can consider the event notifcation as delivered. The `eventId` can be [retrieved manually](/api-reference/endpoint/get-event), or even triggered again at a later date. Additionally, the transaction can be looked up manually using the `transactionId` field value.
+<Note>
+    Find out more about events on the [dedicated page](/events/event-webhooks).
+</Note>
