@@ -175,10 +175,10 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /hub/merchants/itc/get:
+  /hub/bills/get-services:
     get:
-      summary: Get billers
-      description: Retrieves all billers.
+      summary: Get biller services
+      description: Retrieves all biller services.
       security:
         - adminAuth: []
       responses:
@@ -188,6 +188,130 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RetrievedBillersResponse'
+        '400':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /hub/bills/lookup:
+    post:
+      summary: Look up account
+      description: Look up account per specific biller, by reference.
+      security:
+        - adminAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillAccountLookup'
+      responses:
+        '200':
+          description: Bill service account details retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrievedBillerAccountResponse'
+        '400':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /hub/bills/pay:
+    post:
+      summary: Pay bill
+      description: Initiate a bill payment, after lookup.
+      security:
+        - adminAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BillPayment'
+      responses:
+        '200':
+          description: Bill payment succesfully initiated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BillPaymentInitiatedResponse'
+        '400':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /hub/bills/purchase-airtime:
+    post:
+      summary: Purchase airtime
+      description: Initiate an airtime purchase
+      security:
+        - adminAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AirtimePurchase'
+      responses:
+        '200':
+          description: Bill payment succesfully initiated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AirtimePurchaseInitiatedResponse'
+        '400':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /hub/bills/ecg/check-meter-status:
+    get:
+      summary: Check meter status
+      description: Retrieves meter live status.
+      security:
+        - adminAuth: []
+      parameters:
+        - name: meterId
+          in: path
+          description: ID of the meter
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Meter status successfully retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrievedECGMeterStatusResponse'
+        '400':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /hub/bills/ecg/get-meters-by-phone-number:
+    get:
+      summary: Get meters by phone number
+      description: Retrieves meters linked to specified phone number.
+      security:
+        - adminAuth: []
+      parameters:
+        - name: phoneNumber
+          in: path
+          description: Saved phone number
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Meters successfully retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrievedECGMetersResponse'
         '400':
           description: unexpected error
           content:
@@ -433,6 +557,94 @@ components:
           enum:
             - bank
             - momo
+    BillAccountLookup:
+      type: object
+      properties:
+        billServiceProviderId:
+          type: string
+          description: The ID of the designated service provider
+        billServiceProductId:
+          type: string
+          description: The ID of the designated service provider's product
+        accountReference:
+          type: string
+          description: The reference for the account the payment is for
+    BillPayment:
+      type: object
+      required:
+        - accountReference
+        - amount
+        - lastMethod
+        - sessionId
+        - phoneNumber
+        - description
+        - payerName
+        - externalTransactionId
+        - billServiceProviderId
+        - billServiceProductId
+      properties:
+        accountReference:
+          type: string
+          description: The reference of the account the payment is for
+        amount:
+          type: number
+          description: Cedi (GHS) amount of the payment
+        lastMethod:
+          type: string
+          enum: ["lookup", "commit"]
+          description: Specify the most recently called function in this session
+        sessionId:
+          type: string
+          description: ID for current session
+        phoneNumber:
+          type: string
+          description: Phone number of payer
+        description:
+          type: string
+          description: Description for bill payment transaction
+        payerName:
+          type: string
+          description: Name of entity performing payment
+        externalTransactionId:
+          type: string
+          description: Third-party ID to track transaction
+        callbackUrl:
+          type: string
+          description: HTTP POST endpoint to receive notifications
+        billServiceProviderId:
+          type: string
+          description: The ID of the designated service provider
+        billServiceProductId:
+          type: string
+          description: The ID of the designated service provider's product
+    AirtimePurchase:
+      type: object
+      required:
+        - accountReference
+        - amount
+        - network
+        - description
+        - externalTransactionId
+      properties:
+        accountReference:
+          type: string
+          description: The phoneNumber of the account the purchase is for
+        amount:
+          type: number
+          description: Cedi (GHS) amount of the payment
+        network:
+          type: string
+          enum: ["MTN", "Telecel", "AT"]
+          description: Specify network for phone number
+        description:
+          type: string
+          description: Description for bill payment transaction
+        externalTransactionId:
+          type: string
+          description: Third-party ID to track transaction
+        callbackUrl:
+          type: string
+          description: HTTP POST endpoint to receive notifications
     MerchantLogin:
       type: object
       properties:
@@ -532,16 +744,55 @@ components:
         message:
           type: string
         data:
+          type: array
+          items:
+            type: object
+            properties:
+              billServiceProviderId:
+                type: string
+              billServiceProviderName:
+                type: string
+              billServiceProductId:
+                type: string
+              billServiceProductName:
+                type: string
+              billServiceProviderLogo:
+                type: string
+    RetrievedBillerAccountResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        accountDetails:
           type: object
-          properties:
-            merchantId:
-              type: string
-            name:
-              type: string
-            contactAddress: {}
-            contactEmail: {}
-            merchantLogo: {}
-            merchantDescription: {}
+    BillPaymentInitiatedResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        accountDetails:
+          type: object
+    AirtimePurchaseInitiatedResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        accountDetails:
+          type: object 
+    RetrievedECGMeterStatusResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        meterStatus:
+          type: boolean 
+    RetrievedECGMetersResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        meters:
+          type: array 
     SuccessfulMerchantLoginResponse:
       allOf:
         - $ref: '#/components/schemas/SuccessResponse'

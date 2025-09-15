@@ -1,0 +1,89 @@
+---
+title: "Overview"
+description: "What to know about bill payments"
+icon: toolbox
+---
+
+The PeoplesPay platform supports bill payments, via a merchant account. The account must be funded to perform these operations. Bill payments operate on a **prepaid** basis.
+
+## Bill categories
+Payments can be performed for:
+- utilities (water and electric)
+- DSTV
+- school fee payments
+- airtime and data bundles
+
+## Bill payment flow
+To complete a bill payment, a number of steps must be followed, with some conditions.
+
+<Tabs>
+    <Tab title="General utilities">
+        <Info>
+            Note that the flow below applies to water utility, TV subscriptions and school fee payments.
+        </Info>
+        <Steps>
+            <Step title="Get services">
+                The first step is to query available services. The corresponding `billServiceProviderId`, `billServiceProductId` must be included in the subsequent request.
+            </Step>
+            <Step title="Lookup account">
+                The account that is to be credited must be looked up. The returned `sessionId` is required for the commit step.
+            </Step>
+            <Step title="Commit">
+                The payment is initiated.
+            </Step>
+            <Step title="Webhook call">
+                The requester receives an HTTP notification at the specified webhook URL.
+            </Step>
+        </Steps> 
+    </Tab>
+    <Tab title="ECG">
+        <Steps>
+            <Step title="Get services">
+                The first step is to query available services. The corresponding `billServiceProviderId`, `billServiceProductId` must be included in the subsequent request.
+            </Step>
+            <Step title="Lookup meter">
+                The meter that is to be credited must be looked up. The returned `sessionId` is required for the commit step.
+            </Step>
+            <Step title="Check meter status">
+                The meter status must be checked, to ensure its current availability.
+            </Step>
+            <Step title="Commit">
+                The payment is initiated.
+            </Step>
+            <Step title="Webhook call">
+                The requester receives an HTTP notification at the specified webhook URL.
+            </Step>
+        </Steps>        
+    </Tab>
+    <Tab title="Airtime">
+        <Steps>
+            <Step title="Initiate purchase">
+                Specify the network, the phone number and amount, then fire the API call.
+            </Step>
+            <Step title="Webhook call">
+                The requester receives an HTTP notification at the specified webhook URL.
+            </Step>
+        </Steps>               
+    </Tab>
+    <Tab title="Data bundles">
+        <Steps>
+            <Step title="Query available data bundles">
+                Check for available data bundles.
+            </Step>
+            <Step title="Initiate purchase">
+                Specify the network, the phone number and amount, then fire the API call.
+            </Step>
+            <Step title="Webhook call">
+                The requester receives an HTTP notification at the specified webhook URL.
+            </Step>
+        </Steps>
+    </Tab>
+</Tabs>
+
+
+
+## Management
+Bill payment transactions show up with a `transactionType` of `PB` in tranasaction history. Airtime topups have a `transactionType` of `AT` As such, look out for those entries when [retrieving transaction history](/api-reference/endpoint/get-transactions).
+
+## Next steps
+Go to the [API playground](/api-reference/endpoint/get-billers) to interact with our endpoints.

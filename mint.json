@@ -68,7 +68,7 @@
         {
           "group": "Bill Payments",
           "pages": [
-            "bills/introduction"
+            "bills/overview"
           ]
         }
       ]
@@ -116,7 +116,12 @@
     {
       "group": "Bill payments",
       "pages": [
-        "api-reference/endpoint/get-billers"
+        "api-reference/endpoint/get-billers",
+        "api-reference/endpoint/lookup-bill-account",
+        "api-reference/endpoint/pay-bill",
+        "api-reference/endpoint/purchase-airtime",
+        "api-reference/endpoint/get-ecg-meter-status",
+        "api-reference/endpoint/get-ecg-meters-by-phone-number"
       ]
     },
     {
