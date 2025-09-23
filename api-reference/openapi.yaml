@@ -175,6 +175,25 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /hub/get-balance:
+    get:
+      summary: Get current balance
+      description: Retrieves balance for current merchant
+      security:
+        - adminAuth: []
+      responses:
+        '200':
+          description: Balance retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrievedBalanceResponse'
+        '400':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /hub/bills/get-services:
     get:
       summary: Get biller services
@@ -706,6 +725,13 @@ components:
             reference:
               type: string
               description: The current transaction's reference
+    RetrievedBalanceResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        currentBalance:
+          type: number
     RetrievedAllTransactionsResponse:
       type: object
       properties:
