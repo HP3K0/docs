@@ -278,7 +278,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AirtimePurchaseInitiatedResponse'
+                $ref: '#/components/schemas/SuccessfulTransactionResponse'
         '400':
           description: unexpected error
           content:
@@ -331,6 +331,62 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/RetrievedECGMetersResponse'
+        '400':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /hub/bills/get-data-bundles:
+    get:
+      summary: Get data bundles by network
+      description: Retrieves data bundles for a given network.
+      security:
+        - adminAuth: []
+      parameters:
+        - name: phoneNumber
+          in: path
+          description: Phone number
+          required: true
+          schema:
+            type: string
+        - name: network
+          in: path
+          description: Mobile network
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Data bundles successfully retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrievedDataBundlesResponse'
+        '400':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /hub/bills/purchase-data-bundle:
+    post:
+      summary: Purchase data bundle
+      description: Initiates data bundle purchase.
+      security:
+        - adminAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AirtimePurchase'
+      responses:
+        '200':
+          description: Data bundle purchase successfully initiated.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessfulTransactionResponse'
         '400':
           description: unexpected error
           content:
@@ -664,6 +720,34 @@ components:
         callbackUrl:
           type: string
           description: HTTP POST endpoint to receive notifications
+    DataBundlePurchase:
+      type: object
+      required:
+        - accountReference
+        - amount
+        - network
+        - description
+        - externalTransactionId
+      properties:
+        accountReference:
+          type: string
+          description: The phoneNumber of the account the purchase is for
+        amount:
+          type: number
+          description: Cedi (GHS) amount of the payment
+        network:
+          type: string
+          enum: ["MTN", "Telecel", "AT"]
+          description: Specify network for phone number
+        bundle:
+          type: string
+          description: Data bundle name
+        externalTransactionId:
+          type: string
+          description: Third-party ID to track transaction
+        callbackUrl:
+          type: string
+          description: HTTP POST endpoint to receive notifications
     MerchantLogin:
       type: object
       properties:
@@ -702,6 +786,8 @@ components:
             date:
               type: string
               description: The `createdAt` timestamp of the transaction
+            externalTransactionId:
+              type: string
     RetrievedTransactionResponse:
       allOf:
         - $ref: '#/components/schemas/SuccessResponse'
@@ -819,6 +905,24 @@ components:
           type: boolean
         meters:
           type: array 
+    RetrievedDataBundlesResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        network:
+          type: string
+        bundles:
+          type: array
+          items:
+            type: object
+            properties:
+              Display:
+                type: string
+              Value:
+                type: string
+              Amount:
+                type: number
     SuccessfulMerchantLoginResponse:
       allOf:
         - $ref: '#/components/schemas/SuccessResponse'

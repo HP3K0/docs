@@ -127,7 +127,9 @@
         "api-reference/endpoint/pay-bill",
         "api-reference/endpoint/purchase-airtime",
         "api-reference/endpoint/get-ecg-meter-status",
-        "api-reference/endpoint/get-ecg-meters-by-phone-number"
+        "api-reference/endpoint/get-ecg-meters-by-phone-number",
+        "api-reference/endpoint/get-data-bundles",
+        "api-reference/endpoint/purchase-data-bundle"
       ]
     },
     {
