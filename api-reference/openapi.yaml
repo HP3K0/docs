@@ -356,6 +356,10 @@ paths:
           required: true
           schema:
             type: string
+            enum:
+              - MTN
+              - Telecel
+              - AT
       responses:
         '200':
           description: Data bundles successfully retrieved.
