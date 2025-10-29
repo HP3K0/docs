@@ -285,7 +285,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /hub/bills/ecg/check-meter-status:
+  /hub/bills/ecg/check-meter-status/{meterId}:
     get:
       summary: Check meter status
       description: Retrieves meter live status.
@@ -311,7 +311,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
-  /hub/bills/ecg/get-meters-by-phone-number:
+  /hub/bills/ecg/get-meters-by-phone-number/{phoneNumber}:
     get:
       summary: Get meters by phone number
       description: Retrieves meters linked to specified phone number.
@@ -345,13 +345,13 @@ paths:
         - adminAuth: []
       parameters:
         - name: phoneNumber
-          in: path
+          in: query
           description: Phone number
           required: true
           schema:
             type: string
         - name: network
-          in: path
+          in: query
           description: Mobile network
           required: true
           schema:
@@ -640,7 +640,7 @@ components:
       type: object
       required:
         - billServiceProductId
-        - billServiceProductId
+        - billServiceProviderId
         - accountReference
       properties:
         billServiceProviderId:
@@ -770,8 +770,10 @@ components:
       properties:
         email:
           type: string
+          description: Email address of merchant user
         password:
-          type: string
+          description: Merchant user password
+          format: password
     SuccessResponse:
       type: object
       properties:
@@ -921,7 +923,9 @@ components:
         success:
           type: boolean
         meters:
-          type: array 
+          type: array
+          items:
+            type: object
     RetrievedDataBundlesResponse:
       type: object
       properties:
