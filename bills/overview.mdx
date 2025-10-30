@@ -48,11 +48,16 @@ To complete a bill payment, a number of steps must be followed, with some condit
             <Step title="Get services">
                 The first step is to query available services using the [/get-services](/api-reference/endpoint/get-billers) endpoint.
             </Step>
-            <Step title="Lookup account">
+            <Step title="Retrieve meterId (postpaid only)">
+                Using the phone number linked to the postpaid meter, retrieve the `meterId` by calling [/ecg/get-meters-by-phone-number](/api-reference/endpoint/get-ecg-meters-by-phone-number)
+            </Step>
+            <Step title="Lookup meter">
                 <Warning>
-                    Account lookup can only be performed for prepaid meters. For other meter setups, look up using the [/ecg/get-meters-by-phone-number](/api-reference/endpoint/get-ecg-meters-by-phone-number) endpoint to retrieve the meterId
+                    For **prepaid** meters, you can specify the `phoneNumber`, meter number as `accountReference` and `meterCategory` as prepaid, to lookup without first retrieving the `meterId`.
+
+                    For **postpaid** meters, use the meterId from the previous step as the `accountReference`. You may include the `phoneNumber` and `meterCategory` fields in the payload, but that is not required.
                 </Warning>
-                The account that is to be credited must be looked up by calling the [/lookup](/api-reference/endpoint/lookup-bill-account) endpoint. Use the `billServiceProviderId` and `billServiceProductId` values for the biller service returned in the previous step.
+                The meter that is to be credited must be looked up by calling the [/lookup](/api-reference/endpoint/lookup-bill-account) endpoint. Use the `billServiceProviderId` and `billServiceProductId` values for the biller service returned in step 1.
             </Step>
             <Step title="Check meter status">
                 The current availability of the meter must then be checked, by calling the [/ecg/check-meter-status](/api-reference/endpoint/get-ecg-meter-status)
