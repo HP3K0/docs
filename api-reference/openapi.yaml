@@ -674,6 +674,8 @@ components:
         - externalTransactionId
         - billServiceProviderId
         - billServiceProductId
+        - billServiceProductName
+        - billServiceProviderName
       properties:
         accountReference:
           type: string
@@ -709,6 +711,12 @@ components:
         billServiceProductId:
           type: string
           description: The ID of the designated service provider's product
+        billServiceProviderName:
+          type: string
+          description: The name of the designated service provider
+        billServiceProductName:
+          type: string
+          description: The name of the designated service provider's product
     AirtimePurchase:
       type: object
       required:
