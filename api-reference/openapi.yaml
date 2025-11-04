@@ -383,7 +383,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/AirtimePurchase'
+              $ref: '#/components/schemas/DataBundlePurchase'
       responses:
         '200':
           description: Data bundle purchase successfully initiated.
@@ -753,6 +753,8 @@ components:
         - network
         - description
         - externalTransactionId
+        - bundle
+        - callbackUrl
       properties:
         accountReference:
           type: string
