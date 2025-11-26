@@ -109,7 +109,8 @@
         "api-reference/endpoint/get-token",
         "api-reference/endpoint/collect-momo",
         "api-reference/endpoint/collect-card",
-        "api-reference/endpoint/disburse"
+        "api-reference/endpoint/disburse",
+        "api-reference/endpoint/terminate-remittance"
       ]
     },
     {

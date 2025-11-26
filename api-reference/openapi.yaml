@@ -88,6 +88,24 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SuccessfulTransactionResponse'
+  /hub/remittance/terminate:
+    post:
+      summary: Terminate remittance
+      description: Initiates remittance termination, by sending the requested amount to the target recipient.
+      security:
+        - operationAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RemittanceTermination'
+      responses:
+        '200':
+          description: Response for successfully received request to terminate remittance.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessfulTransactionResponse'
   /merchants/login:
     post:
       security: []
@@ -636,6 +654,92 @@ components:
           enum:
             - bank
             - momo
+    RemittanceTermination:
+      type: object
+      required:
+        - payerName
+        - recipientName
+        - recipientAddress
+        - payerPhoneNumber
+        - recipientPhoneNumber
+        - countryOfOrigin
+        - recipientGender
+        - originalCurrency
+        - originalAmount
+        - destinationAmount
+        - description
+        - externalTransactionId
+        - accountNumber
+        - accountName
+        - accountIssuer
+        - accountType
+        - callbackUrl
+      properties:
+        payerName:
+          type: string
+          description: Name of the payer initiating the remittance
+        recipientName:
+          type: string
+          description: Name of the recipient receiving the funds
+        recipientAddress:
+          type: string
+          description: Recipient's complete address
+        payerPhoneNumber:
+          type: string
+          description: Payer's phone number
+        recipientPhoneNumber:
+          type: string
+          description: Recipient's phone number
+        countryOfOrigin:
+          type: string
+          description: Currency origin country code [(ISO 3166-1 alpha-2)](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2)
+          maxLength: 2
+        recipientGender:
+          type: string
+          enum:
+            - male
+            - female
+          description: Recipient's gender (case-sensitive enumeration)
+        originalCurrency:
+          type: string
+          format: currency
+          description: Original transaction currency code [(ISO 4217)](https://en.wikipedia.org/wiki/ISO_4217)
+        originalAmount:
+          type: number
+          format: positive
+          description: Original transaction amount (float)
+        destinationAmount:
+          type: number
+          format: positive
+          description: Destination/converted amount (float)
+        description:
+          type: string
+          description: Transaction description or purpose
+        externalTransactionId:
+          type: string
+          description: Client-provided transaction identifier
+        accountNumber:
+          type: string
+          description: Payment destination account number (format specific to bank/momo)
+        accountName:
+          type: string
+          minLength: 3
+          maxLength: 50
+          description: Name associated with accountNumber
+        accountIssuer:
+          type: string
+          description: Issuer of the account (bank name or mobile money provider)
+        accountType:
+          type: string
+          enum:
+            - momo
+            - bank
+          default: momo
+          description: Payment account type (default; momo)
+        callbackUrl:
+          type: string
+          format: uri
+          description: Endpoint for receiving transaction status updates
     BillAccountLookup:
       type: object
       required:
