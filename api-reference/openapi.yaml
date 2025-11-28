@@ -756,15 +756,6 @@ components:
         accountReference:
           type: string
           description: The reference for the account the payment is for
-        meterCategory:
-          type: string
-          description: The type of meter (prepaid or postpaid)
-          enum:
-            - prepaid
-            - postpaid
-        phoneNumber:
-          type: string
-          description: The phone number linked to the meter
     BillPayment:
       type: object
       required:
