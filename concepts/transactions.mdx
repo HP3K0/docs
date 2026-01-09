@@ -51,3 +51,15 @@ curl
 ```
 
 The response will return transaction history as an array of objects in JSON format.
+
+
+## Transaction statuses
+
+Transactions (virtually across all types) will have the following statuses:
+|Status|Explanation|
+|---|---|
+|paid|Transaction is paid.|
+|failed|Transaction has failed.|
+|pp|Transaction is pending (payment pending).|
+|pc|Transaction has been debited from source, but hasn't been credited yet.|
+|TCS-PENDING|Transaction is reported as pending (by GhIPSS).|
