@@ -38,8 +38,7 @@
     {
       "group": "Platform reference",
       "pages": [
-        "concepts/transactions",
-        "concepts/merchants"
+        "concepts/transactions"
       ]
     },
     {
