@@ -1,0 +1,149 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "PeoplesPay API Documentation",
+  "colors": {
+    "primary": "#bd2130",
+    "light": "#f8e8ea",
+    "dark": "#bd2130"
+  },
+  "favicon": "/favicon.svg",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Platform reference",
+            "pages": [
+              "concepts/transactions"
+            ]
+          },
+          {
+            "group": "Authentication",
+            "pages": [
+              "authentication/merchants"
+            ]
+          },
+          {
+            "group": "Operations",
+            "pages": [
+              {
+                "group": "Collections",
+                "pages": [
+                  "collections/collections-api",
+                  "collections/collections-checkout"
+                ]
+              },
+              {
+                "group": "Disbursements",
+                "pages": [
+                  "disbursements/disbursements-api",
+                  "disbursements/disbursements-portal"
+                ]
+              },
+              {
+                "group": "Bill Payments",
+                "pages": [
+                  "bills/overview"
+                ]
+              }
+            ]
+          },
+          {
+            "group": "Errors",
+            "pages": [
+              "errors/error-codes"
+            ]
+          },
+          {
+            "group": "Features",
+            "pages": [
+              "events/event-webhooks"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "API Documentation",
+            "pages": [
+              "api-reference/introduction"
+            ]
+          },
+          {
+            "group": "Authentication",
+            "pages": [
+              "api-reference/endpoint/merchant-login"
+            ]
+          },
+          {
+            "group": "Account management",
+            "pages": [
+              "api-reference/endpoint/get-balance"
+            ]
+          },
+          {
+            "group": "Operations",
+            "pages": [
+              "api-reference/endpoint/get-token",
+              "api-reference/endpoint/collect-momo",
+              "api-reference/endpoint/collect-card",
+              "api-reference/endpoint/disburse",
+              "api-reference/endpoint/terminate-remittance"
+            ]
+          },
+          {
+            "group": "Transaction management",
+            "pages": [
+              "api-reference/endpoint/get-transaction",
+              "api-reference/endpoint/get-transactions"
+            ]
+          },
+          {
+            "group": "Bill payments",
+            "pages": [
+              "api-reference/endpoint/get-billers",
+              "api-reference/endpoint/lookup-bill-account",
+              "api-reference/endpoint/pay-bill",
+              "api-reference/endpoint/purchase-airtime",
+              "api-reference/endpoint/get-ecg-meter-status",
+              "api-reference/endpoint/get-ecg-meters-by-phone-number",
+              "api-reference/endpoint/get-data-bundles",
+              "api-reference/endpoint/purchase-data-bundle"
+            ]
+          },
+          {
+            "group": "Events",
+            "pages": [
+              "api-reference/endpoint/get-events",
+              "api-reference/endpoint/get-event",
+              "api-reference/endpoint/fire-event"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "logo": {
+    "light": "/logo/pp-logo-orig.svg",
+    "dark": "/logo/pp-logo-white.svg"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Support",
+        "href": "mailto:paul.kouadio@bsystemslimited.com"
+      }
+    ]
+  }
+}

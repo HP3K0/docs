@@ -212,6 +212,30 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+  /hub/merchant/enquiry:
+    post:
+      summary: Recipient name enquiry
+      description: Retrieves name of target recipient
+      security:
+        - adminAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NameEnquiry'
+      responses:
+        '200':
+          description: Name retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessfulNameEnquiryResponse'
+        '400':
+          description: unexpected error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
   /hub/bills/get-services:
     get:
       summary: Get biller services
@@ -879,6 +903,23 @@ components:
         password:
           description: Merchant user password
           format: password
+    NameEnquiry:
+      type: object
+      required:
+        - account_number
+        - account_issuer
+        - account_type
+      properties:
+        account_number:
+          type: string
+          description: The number of the recipient account 
+        account_issuer:
+          type: string
+          description: Code for account issuer (see our [issuer reference](/concepts/account-issuers))
+        account_type:
+          type: string
+          enum: ["bank", "momo"]
+          description: Type of recipient accouunt
     SuccessResponse:
       type: object
       properties:
@@ -1057,6 +1098,19 @@ components:
             data: {}
             token:
               type: string
+    SuccessfulNameEnquiryResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+        code:
+          type: string
+          default: 01
+        message:
+          type: string
+          default: success
+        data:
+          type: string
     RetrievedEventResponse:
       type: object
       properties:
