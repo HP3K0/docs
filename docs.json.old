@@ -23,8 +23,7 @@
           {
             "group": "Platform reference",
             "pages": [
-              "concepts/transactions",
-              "concepts/account-issuers"
+              "concepts/transactions"
             ]
           },
           {
@@ -91,12 +90,6 @@
             "group": "Account management",
             "pages": [
               "api-reference/endpoint/get-balance"
-            ]
-          },
-          {
-            "group": "Merchant utility requests",
-            "pages": [
-              "api-reference/endpoint/name-enquiry"
             ]
           },
           {
