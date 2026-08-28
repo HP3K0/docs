@@ -656,6 +656,8 @@ components:
         description:
           description: Brief description of the transaction
           type: string
+          maxLength: 74
+          minLength: 3
         callbackUrl:
           type: string
           description: The URL that will receive webhook containing transaction status.
