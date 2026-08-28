@@ -1,0 +1,119 @@
+---
+title: "Introduction"
+description: "Initiating collection transactions"
+---
+
+Collection transactions are initiated by calling the API to collect money from an end-user. We currently support mobile money and bank card payment channels. For a complete list of supported mobile money operators and card schemes, please refer to the [Collections overview]()
+
+<Panel>
+<View title="Event">
+     ```json Collection object (in event payload)
+{
+  "eventId": "6a8fcecad33dc394480b8406",
+  "transactionId": "6a8fcecad33dc394480b8111",
+  "amount": 0.1,
+  "status": "failed",
+  "date": "2026-08-27T05:44:27.748Z",
+  "message": "MTN status: FAILED; COULD_NOT_PERFORM_TRANSACTION",
+  "success": true,
+  "code": "02",
+  "externalTransactionId": "runningateston1787809465"
+}
+```   
+</View>
+
+<View title="Record">
+```json Collection object (in history array)
+{
+    "_id": "66df8820eb090f025f823510",
+    "channel": "USSD",
+    "customerId": "63b59e41530aeeaec59a045f",
+    "customerType": "merchants",
+    "amount": 0.01,
+    "actualAmount": 0.01,
+    "charges": 0,
+    "transaction_type": "RM",
+    "credit_type": "credit",
+    "status": "failed",
+    "credit_aggregator": "GHIPPS",
+    "description": "Purchase Of Bigift Card",
+    "charge_type": "merchant",
+    "createdAt": "2024-09-09T23:43:28.867Z",
+    "updatedAt": "2024-09-09T23:43:31.830Z",
+    "payment_account_name": "SOLOMON KWAME TEI",
+    "payment_account_number": "233539105757",
+    "currency": "null",
+    "payment_account_issuer": "mtn",
+    "payment_account_type": "momo",
+    "recipient_account_name": "AgentPOS",
+    "recipient_account_number": "PWCS433052014",
+    "recipient_account_issuer_name": "PPAY",
+    "recipient_account_type": "wallet",
+    "billMerchant": "null",
+    "externalTransactionId": "null",
+    "appId": "640afda470740ed7caa8d599",
+    "debitChannel": "TELCO",
+    "reference": "000001423434",
+    "callbackUrl": "https://ussd.tradepayafrica.com/checkBGiftPayment",
+    "elevyCharges": "null",
+    "elevyApplied": "null",
+    "semantic_id": "1725925408866_BSYSTEMS_63b59e41",
+    "fabRef": "2cff9f4a-1238-437a-a72b-1404595d7087",
+    "gtbRef": "2cff9f4a-1238-437a-a72b-1404595d7087",
+    "openapi_ref": "2cff9f4a-1238-437a-a72b-1404595d7087",
+    "payment_account_issuer_name": "MTN",
+    "reason": "LOW_BALANCE_OR_PAYEE_LIMIT_REACHED_OR_NOT_ALLOWED",
+    "zeepayRef": "2cff9f4a-1238-437a-a72b-1404595d7087",
+    "debitTimeStamp": "2024-09-09T11:43:31.000Z",
+    "providerId": "null",
+    "telecelOriginalConversationID": "null",
+    "telecelTransactionID": "null",
+    "debit_status": "failed",
+    "parentTransactionReference": "null"
+}
+```   
+
+</View>
+</Panel>
+
+## The Collection object
+There are two main collection object references. One is a truncated object delivered in the webhook event payload, the other is the full object included in the transaction history `data` object.
+
+<Warning>
+Toggle between the two objects using the dropdown in the upper right corner of your screen.
+</Warning>
+
+<View title="Event">
+### Properties
+<ResponseField name="amount" type="number">Amount credited to merchant account.</ResponseField>
+<ResponseField name="status" type="string"><Tooltip headline="Transaction status" tip="The authoritative field of a transaction's status. Account credit actions are taken based on this value." cta="Read full reference" href="/concepts/transactions">Status</Tooltip> of transaction.</ResponseField>
+<ResponseField name="date" type="string">Date of collection transaction creation, in-database. ISO timestamp format.</ResponseField>
+<ResponseField name="message" type="string">Accompanying reason for transaction status. Specific error messages for failed transaction statuses will be visible here.</ResponseField>
+<ResponseField name="externalTransactionId" type="string">Merchant-supplied transaction ID for tracking.</ResponseField>
+### More properties
+<ResponseField name="eventId" type="string"><Expandable title="description">ID of emitted webhook event.</Expandable></ResponseField>
+<ResponseField deprecated name="code" type="string" post={["DO NOT USE"]}><Expandable title="description">_Deprecated; will be removed._ Zero-padded numeric code associated with server operation.</Expandable></ResponseField>
+<ResponseField deprecated name="success" type="boolean" default="true"><Expandable title="description">_Deprecated; will be removed._ Boolean field specifying whether the server operation was successful. Value is always `true` in event payloads.</Expandable></ResponseField>
+</View>
+
+<View title="Record">
+### Properties
+<ResponseField name="_id" type="number">Amount credited to merchant account.</ResponseField>
+<ResponseField name="status" type="string"><Tooltip headline="Transaction status" tip="The authoritative field of a transaction's status. Account credit actions are taken based on this value." cta="Read full reference" href="/concepts/transactions">Status</Tooltip> of transaction.</ResponseField>
+<ResponseField name="date" type="string">Date of collection transaction creation, in-database. ISO timestamp format.</ResponseField>
+<ResponseField name="message" type="string">Accompanying reason for transaction status. Specific error messages for failed transaction statuses will be visible here.</ResponseField>
+<ResponseField name="externalTransactionId" type="string">Merchant-supplied transaction ID for tracking.</ResponseField>
+### More properties
+<ResponseField name="eventId" type="string"><Expandable title="description">ID of emitted webhook event.</Expandable></ResponseField>
+<ResponseField deprecated name="code" type="string" post={["DO NOT USE"]}><Expandable title="description">_Deprecated; will be removed._ Zero-padded numeric code associated with server operation.</Expandable></ResponseField>
+<ResponseField deprecated name="success" type="boolean" default="true"><Expandable title="description">_Deprecated; will be removed._ Boolean field specifying whether the server operation was successful. Value is always `true` in event payloads.</Expandable></ResponseField>
+</View>
+## Related events
+- `transaction.status.updated` - Fired when the status of a transaction is updated. See [event reference](/api-reference/events).
+
+## Endpoints
+|Method|Path|Description|
+|---|---|---|
+|<Badge color="blue">POST</Badge>|[`/hub/token/get`](/api-reference/endpoint/get-token)|Generate bearer token for collection request|
+|<Badge color="blue">POST</Badge>|[`/hub/collectmoney`](/api-reference/endpoint/collect-momo)|Initiate collection via mobile money channel|
+|<Badge color="blue">POST</Badge>|[`/hub/collectmoney/card`](/api-reference/endpoint/collect-card)|Initiate collection via bank card|
