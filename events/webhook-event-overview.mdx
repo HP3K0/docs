@@ -1,12 +1,8 @@
 ---
-title: 'Event delivery'
+title: 'Webhook event overview'
 icon: envelope
 description: 'Receive PeoplesPay events at webhook endpoints'
 ---
-
-<Warning>
-  This feature is under active development.
-</Warning>
 
 Webhook notifcations are a crucial component to our payment flows, helping you stay informed in real-time whenever specific events occur on our platform. The main current usecase on PeoplesPay is tracking payment transactions, with more in the pipeline. Contact support to place requests for new event types and payloads.
 
@@ -37,3 +33,5 @@ Retrieve an event by calling the /get endpoint and passing the `eventId` as a UR
 ### Retrying event delivery
 Retry event delivery by calling the /fire endpoint and passing the `eventId` as a URL parameter.
 
+### Creating a new event delivery
+If you haven't received any events to your webhook url (passed as the `callbackUrl` value when initiating the transaction), a retry will not work. In that case, contact support.

@@ -67,7 +67,13 @@
           {
             "group": "Features",
             "pages": [
-              "events/event-webhooks"
+              {
+                "group": "Webhook events",
+                "root": "events/webhook-event-overview",
+                "pages": [
+                  "events/transaction-events"
+                ]
+              }
             ]
           }
         ]
@@ -100,13 +106,25 @@
             ]
           },
           {
-            "group": "Operations",
+            "group": "Transaction execution",
             "pages": [
-              "api-reference/endpoint/get-token",
-              "api-reference/endpoint/collect-momo",
-              "api-reference/endpoint/collect-card",
-              "api-reference/endpoint/disburse",
-              "api-reference/endpoint/terminate-remittance"
+              {
+                "group": "Collections",
+                "pages": [
+                  "api-reference/collections",
+                  "api-reference/endpoint/get-token",
+                  "api-reference/endpoint/collect-momo",
+                  "api-reference/endpoint/collect-card"
+                ]
+              },
+              {
+                "group": "Disbursements",
+                "root": "api-reference/disbursements",
+                "pages": [
+                  "api-reference/endpoint/get-token",
+                  "api-reference/endpoint/disburse"
+                ]
+              }
             ]
           },
           {
@@ -117,20 +135,8 @@
             ]
           },
           {
-            "group": "Bill payments",
-            "pages": [
-              "api-reference/endpoint/get-billers",
-              "api-reference/endpoint/lookup-bill-account",
-              "api-reference/endpoint/pay-bill",
-              "api-reference/endpoint/purchase-airtime",
-              "api-reference/endpoint/get-ecg-meter-status",
-              "api-reference/endpoint/get-ecg-meters-by-phone-number",
-              "api-reference/endpoint/get-data-bundles",
-              "api-reference/endpoint/purchase-data-bundle"
-            ]
-          },
-          {
             "group": "Events",
+            "root": "api-reference/events",
             "pages": [
               "api-reference/endpoint/get-events",
               "api-reference/endpoint/get-event",
