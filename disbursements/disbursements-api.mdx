@@ -1,16 +1,21 @@
 ---
-title: Using the API
-icon: link
+title: Disbursing via API
+icon: person-arrow-down-to-line
 description: Disburse money from a PeoplesPay account
 ---
 
-Disbursements are one of the ways you can send money from your PeoplesPay account. You can disburse money into bank accounts and mobile money wallets.
+<Badge color="red">Synchronous flow</Badge>
+
+Disbursements are the chief method for sending money from your PeoplesPay account to recipient accounts. You can disburse money into bank accounts and mobile money wallets.
 
 ## Authentication
-Much like a collection, the first step in a PeoplesPay disbursement is token generation. Call the [/hub/token/get](/api-reference/endpoint/get-token) endpoint
-with the appropriate payload to retrieve time-limited access token that authorizes subsequent disbursement requests. This JWT access token
-encodes the merchant's `appId` and the type of operation.
+The first step in a PeoplesPay disbursement is token generation. By calling <Badge color="blue">POST</Badge> [/hub/token/get](/api-reference/endpoint/get-token-disbursement) with the correct payload, the platform issues a time-limited access token that authorizes subsequent disbursement requests. 
+<Check name="Best practice">
+It is a good idea to cache this token. It's time-to-live is 60 minutes.
+</Check>
 
+## Optional: name verification
+For certain kinds of applications, it may be helpful or required to verify the name of an account holder, before initiating disbursement. To do that, perform a [recipient name enquiry](/api-reference/endpoint/name-enquiry)
 
 ## Performing the disbursement
  Disbursement flow is as follows:
@@ -19,38 +24,28 @@ encodes the merchant's `appId` and the type of operation.
         The disbursement is initialised as the POST request is sent to the corresponding [endpoint](/api-reference/endpoint/disburse).
     </Step>
     <Step title="Validation">
-        The source account is validated, with checks performed on its access, existence and balance.
+        The source merchant account on PeoplesPay is validated, with checks performed on its access, existence and balance.
     </Step>
     <Step title="Routing">
-        The PeoplesPay platform routes the transaction to the specified destination
+        The PeoplesPay platform routes the transaction to the specified destination.
     </Step>
     <Step title="Completion">
-        The disbursement transaction is either resolved (status=`paid` or status=`failed`) or pending.
+        The disbursement transaction is either <Tooltip headline="Disbursement statuses" tip="Disbursements may have one of several statuses. The status will be specified in the webhook notification you receive." cta="View transaction status reference" href="/concepts/transactions">resolved to a terminal status or remains pending</Tooltip>.
     </Step>
  </Steps>
 
-## Event notification
-Unlike [collections](/collections/), disbursements are currently synchronous requests, so the immediate HTTP response indicates whether the disbursement succeeded, failed or is pending.
+## Post-initiation
+Disbursements are **synchronous** requests, so on occasion they may be much longer-lived than collections. The immediate HTTP response indicates whether the collection request has been _received_ and initiated, not its completion.
 
-Pending disbursement transactions will have their statuses periodically checked. When the transaction status is updated, a notification will be delivered to the supplied webhook endpoint, which is the URL passed in the `callbackUrl` field. The HTTP notification will have the following structure:
-```json
-{
-  "eventId": "68a36233b0bab4e3f5ccc000",
-  "transactionId": "68a36227b0bab4e3f5bbb000",
-  "amount": 10,
-  "status": "paid",
-  "date": "2025-01-01T18:00:00.500Z",
-  "message": "Transaction processed successfully",
-  "code": "00",
-  "success": true
-}
-```
+<Danger>If GhIPSS is experiencing degraded service quality, the request may even time out. In that case, do not take any terminal actions in your application until the status of that transaction is fully determined.</Danger>
+
+Once PeoplesPay receives details on the disbursement from GhIPSS, it will update the transaction status, which creates an event and fires a webhook notification. This notification is delivered to the supplied webhook endpoint, which is the URL passed in the `callbackUrl` field. See the shape of the [event object here](/api-reference/events).
 
 <Warning>
-    Without providing a `callbackUrl`, you will not receive webhook notifcations. Ensure your request payload includes that field.
+    Without providing a `callbackUrl`, you will not receive webhook notifications. Ensure your request payload includes that field.
 </Warning>
 
-The supplied `callbackUrl` must return an HTTP `200` response upon receiving the notification above, so the PeoplesPay platform can consider the event notifcation as delivered. The `eventId` can be [retrieved manually](/api-reference/endpoint/get-event), or even triggered again at a later date. Additionally, the transaction can be looked up manually using the `transactionId` field value.
+The supplied `callbackUrl` must return an HTTP `200` response upon receiving the notification above, so the PeoplesPay platform can consider the event notification as delivered. The `eventId` can be [retrieved manually](/api-reference/endpoint/get-event), or even triggered again at a later date. Additionally, the transaction can be [looked up manually](/api-reference/endpoint/get-transaction) using the `transactionId` field value.
 <Note>
-    Find out more about events on the [dedicated page](/events/event-webhooks).
+    Find out more about events on the [dedicated page](/events/events-overview).
 </Note>

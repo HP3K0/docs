@@ -5,3 +5,55 @@ description: Learn about merchant accounts
 ---
 
 Merchants are businesses that perform operations on the PeoplesPay platform.
+
+## Merchant login
+Merchant login refers to accessing the PeoplesPay platform as a merchant user. Your merchant has an initial user by default, created using the email address used during onboarding, along with the generated password sent to that same address.
+
+## The merchant portal
+The merchant portal is a single pane of glass for merchant operations. Through it you can:
+- view live transactions
+- download transaction history
+- view historical transaction data
+- perform bulk disbursements
+- manage apps
+- view settlements
+- fund your wallet
+
+## Merchant account
+Properly speaking, your merchant account is the "wallet" in which your funds live on PeoplesPay. When you collect money, your merchant account is credited once applicable charges have been levied. Similarly, disbursing money takes money from your merchant account and routes it to your specified recipient(s)and routes it to your specified recipient(s).
+
+Your merchant account balance is visible in the header of the merchant portal once you log in. It can also retrieved by calling the [`/hub/get-balance`](/api-reference/endpoint/get-balance) endpoint.
+
+## Apps and API access
+API profiles are termed **apps** on PeoplesPay. An app has a name, and ID and an associated API key. Transactions that are performed via API are labelled with the details of the originating app.
+|Concept|How it is used|
+|---|---|
+|App name|Displayed in disbursement success SMS messages|
+|App ID|Visible as `appId` in transaction data and used when creating checkout links|
+|API key|Used to generate authentication tokens for transaction execution|
+<Note>
+Unlike the merchant user, completing onboarding doesn't automatically create an app. You will have to manually create one.
+</Note>
+
+## Transactions
+Alongside merchants, [transactions](/concepts/transactions) are fundamental to PeoplesPay. All transactions you perform (across apps) will be visible on the portal and in downloadable reports.
+
+### Transaction data
+The landing page of the merchant portal shows a data table with a date filter. You can use that to examine transactions, whether fresh and still pending or historical records from years ago.
+
+Transaction data includes applied charges, payment and recipient account details, the status of the transaction, timestamps, your `externalTransactionId`, and more.
+
+## Consuming the PeoplesPay API
+To consume the PeoplesPay API, you simply need a created app and use its API key. If you'd like to connect your application to PeoplesPay so you can sync transaction statuses and consume other features, you need to complete [integration](/integration/introduction). To get a feel for what that will look like, go to the [API playground](/api-reference/introduction) and try calling various endpoints.
+
+## Conditional restrictions
+Under certain conditions, you may experience specific restrictions in using the PeoplesPay platform.
+|Condition|Outcome|
+|---|---|
+|Collection disabled|Attempts to generate a token via `/hub/token/get` with `operation: DEBIT` fail|
+|Disbursement disabled|Attempts to generate a token via `/hub/token/get` with `operation: CREDIT` fail|
+|Restricted transaction amounts|Attempting to collect or disbursement more than the applied limit results in a failure|
+|Inactive merchant (e.g. incomplete onboarding)|Any attempt to call the API will fail, as will merchant portal login|
+
+## Getting help
+If you need assistance or you have feature requests, [contact support](mailto:ppsupport@bsystemslimited).

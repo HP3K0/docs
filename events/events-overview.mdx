@@ -1,0 +1,33 @@
+---
+title: 'Introduction'
+icon: envelope
+description: 'Learn about PeoplesPay events.'
+---
+
+## Event overview
+The PeoplesPay platform generates events internally in response to specific system states. Merchants are notified of relevant events via webhook notifications. These are sent to destinations, i.e. webhook endpoints that merchants make available to PeoplesPay.
+
+## Event types
+The PeoplesPay API delivers different types of events. Each has a different payload, but they will each include an `eventId`, which can be used to manage the event.
+
+|Event type|Description|Payload|
+|---|---|---|
+|`transaction.status.updated`|This event type is created and delivered whenever a transaction status changes.|`eventData` is a [collection](/api-reference/collections#properties) or [disbursement](/api-reference/disbursements#properties)
+
+### The `transaction.status.updated` event
+
+This event is created and fired when a transaction status is updated. It is delivered to the `callbackUrl`, which is specified when a transaction (whether collection or disbursement) is initiated.
+
+## Event management
+Events can be retrieved and [webhook notification](/events/webhook-notification-overview) delivery can be re-attempted, to effect particular changes in the client system via the webhook endpoint.
+
+### Retrieving an event
+Retrieve an event by sending a <Badge color="green">GET</Badge> request to the [`/get`](/api-reference/endpoint/get-event) endpoint and passing the `eventId` as a URL parameter.
+
+### Retrying event delivery
+Retry event delivery sending a <Badge color="green">GET</Badge> request to the [`/fire`](/api-reference/endpoint/fire-event) endpoint and passing the `eventId` as a URL parameter.
+
+### Creating a new event delivery
+If you haven't received any events to your webhook url (passed as the `callbackUrl` value when initiating the transaction), a retry will not work. In that case, [contact support](mailto:ppsupport@bsystemslimited.com).
+
+

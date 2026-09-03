@@ -1,0 +1,64 @@
+---
+title: "Disbursing money"
+description: "Initiating disbursement transactions"
+---
+
+Disbursement transactions are initiated by calling the API to disburse money to an end-user. We currently support disbursing to mobile money wallets and bank accounts. For a complete list of supported mobile money operators and bank destinations, please refer to the [table of account issuers](/concepts/account-issuers).
+
+<Panel>
+     ```json Disbursement object (in event payload)
+{
+  "eventId": "6a919dcd1bd6e62bc4df07a8",
+  "transactionId": "6a919dcc1bd6e62bc4df079b",
+  "amount": 0.1,
+  "status": "TCS-PENDING",
+  "date": "2026-08-28T14:40:12.671Z",
+  "message": "Transaction pending | Code: 909",
+  "externalTransactionId": "39bf96e3-03c4-453f-a08e-d2e5cb49a5dd",
+  "code": "01"
+}
+```   
+
+</Panel>
+
+## The disbursement object in events
+The [full transaction object](/api-reference/transactions) is truncated when included in events and delivered in the webhook notifcation payload.
+
+### Properties
+<ResponseField name="transactionId" type="string">PeoplesPay transaction ID.</ResponseField>
+<ResponseField name="amount" type="number">Amount sent to recipient.</ResponseField>
+<ResponseField name="status" type="string"><Tooltip headline="Transaction status" tip="The authoritative field of a transaction's status. Account credit actions are taken based on this value." cta="Read full reference" href="/concepts/transactions">Status</Tooltip> of disbursement transaction.</ResponseField>
+<ResponseField name="date" type="string">Date of disbursement transaction creation, in-database. ISO timestamp format.</ResponseField>
+<ResponseField name="message" type="string">Accompanying message for transaction status. For non-successful transactions (pending or failed), the returned <Tooltip headline="Disbursement error codes" tip="Disbursements are currently processed through GhIPSS. We maintain a list of pending/failure codes, meanings and actions." cta="See GhIPSS error reference" href="/errors/error-codes">GhIPSS error</Tooltip> code and message will be visible here.</ResponseField>
+<ResponseField name="externalTransactionId" type="string">Merchant-supplied transaction ID for tracking.</ResponseField>
+### More properties
+<ResponseField name="eventId" type="string"><Expandable title="description">ID of emitted webhook event.</Expandable></ResponseField>
+<ResponseField deprecated name="code" type="string" post={["DO NOT USE"]}><Expandable title="description">_Deprecated; will be removed._ Zero-padded numeric code associated with server operation.</Expandable></ResponseField>
+
+## Related events
+- `transaction.status.updated` - Fired when the status of a disbursement is updated. See [event reference](/api-reference/events).
+
+## Endpoints
+|Method|Path|Description|
+|---|---|---|
+|<Badge color="blue">POST</Badge>|[`/hub/token/get`](/api-reference/endpoint/get-token-disbursement)|Generate bearer token for disbursement request|
+|<Badge color="blue">POST</Badge>|[`/hub/disburse`](/api-reference/endpoint/disburse)|Initiate disbursement via mobile money channel|
+
+
+
+<Danger>
+Disbursements are synchronous. The HTTP response you receive when calling [`/hub/disburse`](/api-reference/endpoint/disburse) indicates whether PeoplesPay has successfully received your request and passed it on for processing. Nonetheless, ALWAYS wait for the webhook notification before making any updates in your application.
+</Danger>
+
+## How to: performing a disbursement
+<Steps>
+<Step>
+Call <Badge color="green">GET</Badge> `/hub/token/get`. Set `operation` in the request payload to `"CREDIT"` The resulting authentication token can be used for up to 60 minutes before having to request a fresh one.
+</Step>
+<Step>
+Call <Badge color="blue">POST</Badge> `/hub/disburse`. Use the token obtained in step 1 as the `Bearer` token value.
+</Step>
+<Step>
+Wait for the webhook notification at the supplied `callbackUrl`
+</Step>
+</Steps>

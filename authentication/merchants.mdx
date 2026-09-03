@@ -1,23 +1,20 @@
 ---
-title: "Merchant Authentication"
-description: "Accessing the API as a merchant"
+title: "Authentication"
+icon: handshake
+description: "How authentication works on PeoplesPay"
 ---
 
-Merchant authentication on the PeoplesPay platform is very straightforward. The only two things to keep in mind is that
-API keys are used to initiate transactions, and pretty much anything else is accessed by using the `token` returned
-upon merchant login.
+There are two main types of authentication for PeoplesPay merchants: merchant login, and transaction token generation.
 
 ## Merchant login
-The vast majority of merchant operations (bar transaction initiation) are completed by the [merchant portal](https://merchants.peoplespay.com.gh).
-Logging into the portal requires the email address used when onboarding, and your password. A login session can be created programmatically
-by calling the [`/login`](/api-reference/endpoint/merchant-login) endpoint with a POST request containing the `email` and `password`. The returned
-`token` expires after 30 minutes.
+During merchant onboarding, an email address must be registered, to which a generated password is sent for subsequent login to the [merchant portal](https://merchants.peoplespay.com.gh). A merchant login session can be created programmatically by calling the [`/login`](/api-reference/endpoint/merchant-login) endpoint with a [<Badge color="blue">POST</Badge> request](/api-reference/endpoint/merchant-login) containing the `email` and `password`. The returned `token` expires after 60 minutes. This authentication token is used for all API calls except transaction execution (i.e. [collecting](/api-reference/collections) or [disbursing](/api-reference/disbursements) funds)
+<Card title="Try merchant login now" href="/api-reference/endpoint/merchant-login" horizontal arrow="true">
+</Card>
 
 ## Token generation for transactions
-Transaction initiation, whether for a `DEBIT` or `CREDIT` requires the creation of a separate access token. The type of transaction you wish
-to initiate will determine the operation to specify in the POST request payload. A *collection* i.e. receiving money from a customer requires
-specifying `DEBIT` in the payload, whilst a *disbursement* i.e. sending money to a customer requires `CREDIT` to be specified. By default, the
-`operation` when calling the [/hub/token/get](/api-reference/endpoint/get-token) endpoint is set to `DEBIT`.
+Transaction execution, whether for a [collection](/concepts/transactions) or a [disbursement](/concepts/transactions) requires the creation of a separate authentication token. The type of transaction you wish to initiate will determine the operation to specify in the <Badge color="blue">POST</Badge> request payload.
+<Card title="Generate an authentication token" href="/api-reference/endpoint/get-token-collection" horizontal arrow="true">
+</Card>
 <Note>
     Keep in mind that not all merchants can perform disbursements. For such merchants, using an `operation` value of `CREDIT` will cause the server
     to raise an error.

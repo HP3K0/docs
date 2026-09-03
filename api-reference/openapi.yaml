@@ -1,4 +1,4 @@
-openapi: 3.0.1
+openapi: 3.1.0
 info:
   title: PeoplesPay API Documentation
   description: PeoplesPay API endpoints, payloads and relevant notes.
@@ -8,14 +8,12 @@ info:
 servers:
   - url: https://peoplespay.com.gh/peoplepay
 security: []
-paths:
-  /hub/token/get:
+webhooks:
+  transaction.status.updated:
     post:
-      summary: Get a token
-      description: Returns a token for an operation (collection or disbursement)
-      security: []
+      summary: Webhook notification sent on transaction status update
       requestBody:
-        description: Specifed operation for given merchant and API user
+        description: testing
         content:
           application/json:
             schema:
@@ -28,8 +26,27 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SuccessfulTokenResponse'
+paths:
+  /hub/token/get:
+    post:
+      summary: Get a token
+      security: []
+      requestBody:
+        description: Specifed operation for given merchant and API user
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TypeOfTransactionToken'
+        required: true
+      responses:
+        '200':
+          description: Successfully generated token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SuccessfulTokenResponse'
         '400':
-          description: Unexpected error
+          description: Bad request.
           content:
             application/json:
               schema:
@@ -47,11 +64,23 @@ paths:
               $ref: '#/components/schemas/MomoCollections'
       responses:
         '200':
-          description: Response for successfully received request to collect
+          description: Successfully received request to collect.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SuccessfulTransactionResponse'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthenticated request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthorizedToken'
   /hub/collectmoney/card:
     post:
       summary: Collect money (via card)
@@ -63,6 +92,40 @@ paths:
           application/json:
             schema:
               $ref: '#/components/schemas/CardCollections'
+      responses:
+        '200':
+          description: Successfully received request to collect.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InitiatedCardCollectionResponse'
+        '500':
+          description: Received request to collect, but transaction failed.
+          content: 
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FailedCardCollectionResponse'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthenticated request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthorizedToken'
+  /api/checkout/redirect/init:
+    post:
+      summary: Collect money (via hosted checkout)
+      description: Initiates a request to pay, via an online checkout page.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CheckoutCollections'
       responses:
         '200':
           description: Response for successfully received request to collect
@@ -88,6 +151,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SuccessfulTransactionResponse'
+        '400':
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthenticated request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthorizedToken'
+
   /hub/remittance/terminate:
     post:
       summary: Terminate remittance
@@ -110,7 +186,7 @@ paths:
     post:
       security: []
       summary: Log in (merchant)
-      description: Log in as merchant
+      description: Log in as merchant user
       requestBody:
         content:
           application/json:
@@ -123,15 +199,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/SuccessfulMerchantLoginResponse'
+        '401':
+          description: Invalid credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UnsuccessfulMerchantLoginResponse'
         '400':
-          description: unexpected error
+          description: Bad request.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
   /hub/transactions/get/{id}:
     get:
-      description: Retrieves a transaction based on the supplied ID
+      description: Retrieves a transaction based on the supplied ID.
       summary: Get transaction by ID
       security:
         - adminAuth: []
@@ -144,17 +226,29 @@ paths:
             type: string
       responses:
         '200':
-          description: Transaction retrieved
+          description: Transaction successfully retrieved.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/RetrievedTransactionResponse'
         '400':
-          description: unexpected error
+          description: Bad request.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthenticated request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthorized'
+        '500':
+          description: Transaction not found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TransactionNotFoundResponse'
   /hub/summary/filter:
     get:
       summary: Get transaction history
@@ -196,18 +290,86 @@ paths:
   /hub/get-balance:
     get:
       summary: Get current balance
-      description: Retrieves balance for current merchant
+      description: Retrieves balance for currently logged in merchant account.
       security:
         - adminAuth: []
       responses:
         '200':
-          description: Balance retrieved
+          description: Balance successfully retrieved.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/RetrievedBalanceResponse'
         '400':
-          description: unexpected error
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthenticated request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthorized'
+  /merchants/profile:
+    get:
+      summary: Get logged in merchant
+      description: Retrieves details for currently logged in merchant
+      security:
+        - adminAuth: []
+      responses:
+        '200':
+          description: Merchant successfully retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrievedMerchantResponse'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthenticated request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthorized'
+        '500':
+          description: Error when retrieving merchant details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+  /merchants/users:
+    get:
+      summary: Get merchant users
+      description: Retrieves user details for currently logged in merchant
+      security:
+        - adminAuth: []
+      responses:
+        '200':
+          description: Merchant successfully retrieved.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RetrievedMerchantUsersResponse'
+        '400':
+          description: Invalid request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthenticated request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthorized'
+        '500':
+          description: Error when retrieving merchant users.
           content:
             application/json:
               schema:
@@ -215,7 +377,7 @@ paths:
   /hub/merchant/enquiry:
     post:
       summary: Recipient name enquiry
-      description: Retrieves name of target recipient
+      description: Retrieves name of target recipient.
       security:
         - adminAuth: []
       requestBody:
@@ -225,17 +387,23 @@ paths:
               $ref: '#/components/schemas/NameEnquiry'
       responses:
         '200':
-          description: Name retrieved
+          description: Name successfully retrieved.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SuccessfulNameEnquiryResponse'
         '400':
-          description: unexpected error
+          description: Bad request.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthenticated request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthorized'
   /hub/bills/get-services:
     get:
       summary: Get biller services
@@ -474,7 +642,9 @@ paths:
   /webhooks/get/{merchant}/{page}:
     get:
       summary: Get all webhook events
-      description: Retrieves all webhook events for a merchant
+      description: Retrieves all webhook events for a merchant.
+      x-mint:
+        content: "<Note>Event record pages are 100 objects long.</Note>"
       security:
         - adminAuth: []
       parameters:
@@ -486,13 +656,13 @@ paths:
             type: string
         - name: page
           in: path
-          description: Page of response
+          description: Pagination; offset in results response. Page size is 100.
           required: true
           schema:
             type: number
       responses:
         '200':
-          description: Webhook events retrieved
+          description: Webhook events retrieved.
           content:
             application/json:
               schema:
@@ -528,7 +698,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/FiredEventResponse"
+                $ref: "#/components/schemas/SuccessResponse"
         '500':
           description: Webhook event error.
           content:
@@ -541,6 +711,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Error'
+        '401':
+          description: Unauthenticated request.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorUnauthorized'
 components:
   schemas:
     TransactionToken:
@@ -586,12 +762,17 @@ components:
         description:
           description: Brief description of the transaction
           type: string
+          pattern: '^[a-zA-Z0-9.-_,]{0,50}$'
         callbackUrl:
           type: string
           description: The URL that will receive webhook containing transaction status.
         externalTransactionId:
           type: string
           description: Optional ID the requester can pass in to track the transaction
+        account_type:
+          type: string
+          default: "momo"
+          description: Type of payment account
     MomoCollections:
       allOf:
         - $ref: '#/components/schemas/Collections'
@@ -603,6 +784,7 @@ components:
             account_number:
               description: Account number
               type: string
+              pattern: '^[0-9]{10}$'
             account_issuer:
               description: Account number's network provider
               type: string
@@ -635,6 +817,16 @@ components:
             clientRedirectUrl:
               description: URL to redirect to upon completed card payment
               type: string
+    CheckoutCollections:
+      allOf:
+        - $ref: '#/components/schemas/Collections'
+        - required:
+            - clientRedirectUrl
+          type: object
+          properties:
+            clientRedirectUrl:
+              description: URL to redirect to upon completed collection
+              type: string
     Disbursements:
       required:
         - amount
@@ -656,20 +848,18 @@ components:
         description:
           description: Brief description of the transaction
           type: string
-          maxLength: 74
-          minLength: 3
         callbackUrl:
           type: string
-          description: The URL that will receive webhook containing transaction status.
+          description: The URL that will receive webhook notification containing transaction status.
         account_number:
           type: string
-          description: The recipient's account number (phone number or bank account)
+          description: The recipient's account number (phone number or bank account number).
         externalTransactionId:
           type: string
-          description: Custom transaction ID to track transaction
+          description: Custom transaction ID to track transaction.
         account_issuer:
           type: string
-          description: Institution the recipient's account belongs to
+          description: Institution the recipient's account belongs to. [Full list of potential values.](/concepts/account-issuers)
           enum:
             - mtn
             - vodafone
@@ -927,8 +1117,10 @@ components:
       properties:
         success:
           type: boolean
+          description: Indicates whether the requested operation was successful.
         message:
           type: string
+          description: Accompanying message describing request outcome.
     SuccessfulTokenResponse:
       allOf:
         - $ref: '#/components/schemas/SuccessResponse'
@@ -936,25 +1128,64 @@ components:
           properties:
             data:
               type: string
+              description: "Authentication token for transaction execution. `TTL: 60 minutes`"
     SuccessfulTransactionResponse:
       allOf:
         - $ref: '#/components/schemas/SuccessResponse'
         - type: object
           properties:
             code:
+              deprecated: true
               type: string
               enum:
                 - '00'
                 - '01'
                 - '02'
+              description: PeoplesPay code representation of request outcome. Deprecated; do not use.
             transactionId:
               type: string
-              description: The ID of the performed transaction
+              description: The PeoplesPay ID of the initiated transaction.
             date:
               type: string
-              description: The `createdAt` timestamp of the transaction
+              description: The `createdAt` ISO timestamp of the transaction.
             externalTransactionId:
               type: string
+              description: The transaction ID you supplied for tracking.
+    InitiatedCardCollectionResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessfulTransactionResponse'
+        - type: object
+          properties:
+            redirectUrl:
+              type:
+                - string
+              description: HTML returned by card gateway. Render this for your end-user to complete the 3D Secure challenge.
+            redirectType:
+              type:
+                - string
+              default: DIV
+              enum:
+                - DIV
+                - URL
+              description: Type of redirect content returned by card gateway.
+    FailedCardCollectionResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessfulTransactionResponse'
+        - type: object
+          properties:
+            redirectUrl:
+              type:
+                - "null"
+              description: HTML returned by card gateway. Render this for your end-user to complete the 3D Secure challenge.
+              default: "null"
+            redirectType:
+              type:
+                - "null"
+              default: "null"
+              enum:
+                - DIV
+                - URL
+              description: Type of redirect content returned by card gateway.
     RetrievedTransactionResponse:
       allOf:
         - $ref: '#/components/schemas/SuccessResponse'
@@ -966,6 +1197,8 @@ components:
                 - '00'
                 - '01'
                 - '02'
+              description: PeoplesPay code representation of request outcome. Deprecated; do not use.
+              deprecated: true
             status:
               type: string
               enum:
@@ -974,47 +1207,55 @@ components:
                 - failed
             transactionId:
               type: string
-              description: The current transaction's ID
-            reference:
-              type: string
-              description: The current transaction's reference
+              description: The ID of the transaction being looked up.
+            data:
+              type: object<[Transaction]()>
+              description: "Contains [`Transaction`](/api-reference/transactions) object."
     RetrievedBalanceResponse:
       type: object
       properties:
         success:
           type: boolean
+          description: Indicates success of the request.
         currentBalance:
           type: number
+          description: Current merchant account balance, in floating point format.
     RetrievedAllTransactionsResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-        message:
-          type: string
-        data:
-          type: array
-          items:
-            type: object
-            properties:
-              code:
-                type: string
-                enum:
-                  - '00'
-                  - '01'
-                  - '02'
-              status:
-                type: string
-                enum:
-                  - paid
-                  - pp
-                  - failed
-              transactionId:
-                type: string
-                description: The current transaction's ID
-              reference:
-                type: string
-                description: The current transaction's reference
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                type: object
+                properties:
+                  _id:
+                    type: string
+                    description: Null `_id` field.
+                  count:
+                    type: number
+                    description: Count of transactions.
+                  totalAmount:
+                    type: number
+                    description: Monetary actual value of transactions (sans charges).
+                  amountWithCharges:
+                    type: number
+                    description: Monetary gross value of transactionsa (with charges).
+                  charges:
+                    type: number
+                    description: Monetary value of applied charges.
+                  openingBalance:
+                    type: number
+                    description: The current transaction's reference
+                  transactions:
+                    type: array
+                    description: "[Transaction object](/api-reference/transactions) record array"
+                    items:
+                      type: object<Transaction>
+            csvFilePath:
+              type: string
+              description: Single-use file path to generated data file.
     RetrievedBillersResponse:
       type: object
       properties:
@@ -1097,111 +1338,60 @@ components:
         - $ref: '#/components/schemas/SuccessResponse'
         - type: object
           properties:
-            data: {}
+            data:
+              $ref: "#/components/schemas/User"
             token:
               type: string
+              description: "Merchant user login token. `TTL: 60 minutes`"
+    UnsuccessfulMerchantLoginResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          default: false
+          description: Indicates whether request operation was successful.
+        message:
+          type: string
+          examples: "Wrong Credentials"
+          description: Accompanying response message.
     SuccessfulNameEnquiryResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-        code:
-          type: string
-          default: 01
-        message:
-          type: string
-          default: success
-        data:
-          type: string
-    RetrievedEventResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-        message:
-          type: string
-        data:
-          type: object
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
           properties:
-            _id:
+            data:
               type: string
-            eventType:
-              type: string
-            createdAt:
-              type: string
-            eventData: {}
-            deliveryStatus: 
-              type: string
-              enum:
-                - DELIVERY_ATTEMPTED
-                - DELIVERED
-                - FAILED
-                - AWAITING_DELIVERY
-            destination:
-              type: string
-            customerId:
-              type: string
-            customerType:
-              type: string
-              enum:
-                - merchants
-                - customer
-            lastAttemptedAt:
-              type: string
-            numberOfAttempts:
-              type: integer
-              format: int32
+              description: The name of the account holder.
+    RetrievedEventResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - $ref: "#/components/schemas/Event"
     RetrievedEventsResponse:
-      type: array
-      items:
-        type: object
-        properties:
-          success:
-            type: boolean
-          message:
-            type: string
-          data:
-            type: object
-            properties:
-              _id:
-                type: string
-              eventType:
-                type: string
-              createdAt:
-                type: string
-              eventData: {}
-              deliveryStatus: 
-                type: string
-                enum:
-                  - DELIVERY_ATTEMPTED
-                  - DELIVERED
-                  - FAILED
-                  - AWAITING_DELIVERY
-              destination:
-                type: string
-              customerId:
-                type: string
-              customerType:
-                type: string
-                enum:
-                  - merchants
-                  - customer
-              lastAttemptedAt:
-                type: string
-              numberOfAttempts:
-                type: integer
-                format: int32
-    FiredEventResponse:
-      type: object
-      properties:
-        success:
-          type: boolean
-        message:
-          type: string
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/Event"
+    RetrievedMerchantResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              $ref: "#/components/schemas/Merchant"
+    RetrievedMerchantUsersResponse:
+      allOf:
+        - $ref: '#/components/schemas/SuccessResponse'
+        - type: object
+          properties:
+            data:
+              type: array
+              items:
+                $ref: "#/components/schemas/User"
     EventError:
-      required:
-        - error
-        - message
       type: object
       properties:
         success:
@@ -1209,20 +1399,251 @@ components:
         message:
           type: string
     Error:
-      required:
-        - error
-        - message
       type: object
       properties:
-        error:
+        statusCode:
           type: integer
           format: int32
+          description: HTTP code for error.
+        error:
+          type: string
+          description: HTTP code message for error.
         message:
           type: string
+          description: PeoplesPay-generated error string.
+    ErrorUnauthorized:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          format: int32
+          description: HTTP code for error.
+        error:
+          type: string
+          description: HTTP code message for error.
+        message:
+          type: string
+          description: PeoplesPay-generated error string.
+        attributes:
+          type: object
+    ErrorUnauthorizedToken:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+          format: int32
+          description: HTTP code for error.
+        error:
+          type: string
+          description: HTTP code message for error.
+        message:
+          type: string
+          description: PeoplesPay-generated error string.
+          examples:
+            - Expired token.
+            - Invalid token.
+        attributes:
+          type: object
+
+    User:
+      type: object
+      description: A user account with an optional reference to an associated merchant.
+      properties:
+        _id:
+          type: string
+          description: Unique identifier for the user.
+        email:
+          type: string
+          format: email
+          description: The user's email address.
+        name:
+          type: string
+          description: Display name of the user.
+        phone:
+          type: string
+          description: Contact phone number of the user.
+        isActive:
+          type: boolean
+          description: Whether the user account is currently active.
+        merchantId:
+          $ref: '#/components/schemas/Merchant'
+        permissions:
+          type: array
+          items:
+            type: string
+          description: List of permissions granted to the user.
+        isPasswordChanged:
+          type: boolean
+          description: Indicates whether the user has changed their initial password.
+        lastSeen:
+          type: string
+          format: date-time
+          description: Timestamp of the user's most recent activity.
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the user account was created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the user account was last updated.
+        __v:
+          type: integer
+          description: Version key for optimistic locking.
+    Merchant:
+      type: object
+      description: A merchant record with business profile, KYC details, account status, and payment channel configuration.
+      required:
+        - _id
+        - merchant_tradeName
+        - envMode
+      properties:
+        _id:
+          type: string
+          description: Unique MongoDB ObjectId for the merchant record.
+        merchantNickName:
+          type: string
+          nullable: true
+          description: Optional short display name for the merchant.
+        merchant_tradeName:
+          type: string
+          description: Registered trade name of the merchant business.
+          examples: BSYSTEMS PEOPLESPAY
+        # --- Business identity / KYC ---
+        businessPhone:
+          type: string
+          description: Primary business contact phone.
+          examples: "0302 254340"
+        email:
+          type: string
+          format: email
+          description: Primary business contact email.
+          examples: info@bsystemslimited.com
+        registrationNumber:
+          type: string
+          description: Official business registration number.
+          examples: CS433052014
+        idNumber:
+          type: string
+          description: Government-issued identification number for the merchant.
+          examples: GHA-725794423-3
+        address:
+          type: string
+          description: Physical business address.
+          examples: Mango Lane, Asylum Down
+        location:
+          type: string
+          description: General locality or city of the business.
+          examples: Asylum Down, Accra
+        lineOfBusiness:
+          type: string
+          description: Primary industry or trade category.
+          examples: Agency Banking
+        # --- Account status flags ---
+        submitted:
+          type: boolean
+          description: Whether onboarding details have been submitted.
+          examples: true
+        decline:
+          type: boolean
+          description: Whether the merchant application has been declined.
+          examples: false
+        active:
+          type: boolean
+          description: Whether the merchant account is currently active.
+          examples: true
+        # --- Payment channel configuration ---
+        ussdCode:
+          type: string
+          description: USSD shortcode assigned to the merchant.
+          examples: "*421*2#"
+        isUSSDActive:
+          type: boolean
+          description: Whether the USSD channel is enabled.
+          examples: true
+        cardDebitChannel:
+          type: string
+          description: Card debit processing channel.
+          examples: GTBLocal
+        momoDebitChannel:
+          type: string
+          description: Mobile money debit processing channel.
+          examples: TELCO
+        # --- Financial limits ---
+        creditLimit:
+          type: number
+          description: Maximum credit extended to the merchant.
+          examples: 10000
+        debitLimit:
+          type: number
+          description: Maximum aggregate debit allowed per period.
+          examples: 10000
+        disbursementCharge:
+          type: number
+          description: Fee applied per disbursement transaction.
+          examples: 0
+        minimumAmount:
+          type: number
+          description: Minimum transaction amount permitted.
+          examples: 0
+        # --- Timestamps ---
+        createdAt:
+          type: string
+          format: date-time
+          description: Timestamp when the merchant record was created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: Timestamp when the merchant record was last updated.
+    Event:
+      type: object
+      properties:
+        _id:
+          type: string
+          description: Event ID.
+        eventType:
+          type: string
+          description: "[Event type](/events/events-overview)."
+        createdAt:
+          type: string
+          description: ISO timestamp of event creation.
+        eventData:
+          type: object<Event>
+          description: "Event data, of type [event object](/api-reference/events)"
+        deliveryStatus: 
+          type: string
+          enum:
+            - DELIVERY_ATTEMPTED
+            - DELIVERED
+            - FAILED
+            - AWAITING_DELIVERY
+          description: Delivery status for webhook notification.
+        destination:
+          type: string
+          description: Merchant URL webhook notification is delivered to.
+        customerId:
+          type: string
+          description: ID of customer event was created for.
+        customerType:
+          type: string
+          enum:
+            - merchants
+            - customer
+          description: Type of customer event was created for.
+          default: merchants
+        lastAttemptedAt:
+          type: string
+          description: ISO timestamp of most recent delivery attempt.
+        numberOfAttempts:
+          type: integer
+          format: int32
+          description: Count of attempted deliveries to `destination`
   securitySchemes:
     adminAuth:
       type: http
       scheme: bearer
+      description: Bearer authentication header of the form `Bearer <token>`, where `<token>` is the [merchant login token](/api-reference/endpoint/merchant-login).
     operationAuth:
       type: http
       scheme: bearer
+      description: Bearer authentication header of the form `Bearer <token>`, where `<token>` is the [transaction execution authentication token](/api-reference/endpoint/get-token-collection).

@@ -1,12 +1,20 @@
 ---
-title: "Introduction"
+title: "Collecting money"
 description: "Initiating collection transactions"
 ---
 
-Collection transactions are initiated by calling the API to collect money from an end-user. We currently support mobile money and bank card payment channels. For a complete list of supported mobile money operators and card schemes, please refer to the [Collections overview]()
+Collection transactions are initiated by calling the API to collect money from an end-user. We currently support mobile money and bank card payment channels:
+- MTN
+- Telecel
+- AT
+- Mastercard
+- VISA
+
+<Info>
+If you plan to collect international (i.e. non-Ghanaian) cards and are experiencing difficulties, discuss that with your onboarding manager or [contact support](mailto:ppsupport@bsystemslimited).
+</Info>
 
 <Panel>
-<View title="Event">
      ```json Collection object (in event payload)
 {
   "eventId": "6a8fcecad33dc394480b8406",
@@ -20,72 +28,11 @@ Collection transactions are initiated by calling the API to collect money from a
   "externalTransactionId": "runningateston1787809465"
 }
 ```   
-</View>
-
-<View title="Record">
-```json Collection object (in history array)
-{
-    "_id": "66df8820eb090f025f823510",
-    "channel": "USSD",
-    "customerId": "63b59e41530aeeaec59a045f",
-    "customerType": "merchants",
-    "amount": 0.01,
-    "actualAmount": 0.01,
-    "charges": 0,
-    "transaction_type": "RM",
-    "credit_type": "credit",
-    "status": "failed",
-    "credit_aggregator": "GHIPPS",
-    "description": "Purchase Of Bigift Card",
-    "charge_type": "merchant",
-    "createdAt": "2024-09-09T23:43:28.867Z",
-    "updatedAt": "2024-09-09T23:43:31.830Z",
-    "payment_account_name": "SOLOMON KWAME TEI",
-    "payment_account_number": "233539105757",
-    "currency": "null",
-    "payment_account_issuer": "mtn",
-    "payment_account_type": "momo",
-    "recipient_account_name": "AgentPOS",
-    "recipient_account_number": "PWCS433052014",
-    "recipient_account_issuer_name": "PPAY",
-    "recipient_account_type": "wallet",
-    "billMerchant": "null",
-    "externalTransactionId": "null",
-    "appId": "640afda470740ed7caa8d599",
-    "debitChannel": "TELCO",
-    "reference": "000001423434",
-    "callbackUrl": "https://ussd.tradepayafrica.com/checkBGiftPayment",
-    "elevyCharges": "null",
-    "elevyApplied": "null",
-    "semantic_id": "1725925408866_BSYSTEMS_63b59e41",
-    "fabRef": "2cff9f4a-1238-437a-a72b-1404595d7087",
-    "gtbRef": "2cff9f4a-1238-437a-a72b-1404595d7087",
-    "openapi_ref": "2cff9f4a-1238-437a-a72b-1404595d7087",
-    "payment_account_issuer_name": "MTN",
-    "reason": "LOW_BALANCE_OR_PAYEE_LIMIT_REACHED_OR_NOT_ALLOWED",
-    "zeepayRef": "2cff9f4a-1238-437a-a72b-1404595d7087",
-    "debitTimeStamp": "2024-09-09T11:43:31.000Z",
-    "providerId": "null",
-    "telecelOriginalConversationID": "null",
-    "telecelTransactionID": "null",
-    "debit_status": "failed",
-    "parentTransactionReference": "null"
-}
-```   
-
-</View>
 </Panel>
 
-## The Collection object
-There are two main collection object references.
-- One is a truncated object delivered in the webhook event payload,
-- the other is the full object included in the transaction history `data` object.
+## The collection object in events
+The [full transaction object](/api-reference/transactions) is truncated when included in events and delivered in the webhook notifcation payload.
 
-<Warning>
-Toggle between the two objects using the dropdown in the upper right corner of your screen.
-</Warning>
-
-<View title="Event">
 ### Properties
 <ResponseField name="amount" type="number">Amount credited to merchant account.</ResponseField>
 <ResponseField name="status" type="string"><Tooltip headline="Transaction status" tip="The authoritative field of a transaction's status. Account credit actions are taken based on this value." cta="Read full reference" href="/concepts/transactions">Status</Tooltip> of transaction.</ResponseField>
@@ -96,88 +43,35 @@ Toggle between the two objects using the dropdown in the upper right corner of y
 <ResponseField name="eventId" type="string"><Expandable title="description">ID of emitted webhook event.</Expandable></ResponseField>
 <ResponseField deprecated name="code" type="string" post={["DO NOT USE"]}><Expandable title="description">_Deprecated; will be removed._ Zero-padded numeric code associated with server operation.</Expandable></ResponseField>
 <ResponseField deprecated name="success" type="boolean" default="true"><Expandable title="description">_Deprecated; will be removed._ Boolean field specifying whether the server operation was successful. Value is always `true` in event payloads.</Expandable></ResponseField>
-</View>
 
-<View title="Record">
-### Properties
-<ResponseField name="_id" type="string">Unique identifier for the collection transaction.</ResponseField>
-<ResponseField name="channel" type="string" default="API">
-Channel used to initiate the collection transaction.
-
-Available values: `API`, `WEB`, `USSD`
-</ResponseField>
-<ResponseField name="customerId" type="string">Identifier of the customer/merchant associated with the transaction.</ResponseField>
-<ResponseField name="customerType" type="string">
-Type of customer associated with the transaction.
-
-Available values: `merchant`, `customer`
-</ResponseField>
-<ResponseField name="amount" type="number">Amount requested for collection.</ResponseField>
-<ResponseField name="actualAmount" type="number">Actual amount credited to merchant account</ResponseField>
-<ResponseField name="charges" type="number">Charges applied to the transaction.</ResponseField>
-<ResponseField name="transaction_type" type="string" default="RM"><mark>Type</mark> of transaction. For collection, this value is "RM". [See transaction type reference.](/concepts/transactions)</ResponseField>
-<ResponseField name="status" type="string"><Tooltip headline="Transaction status" tip="The authoritative field of a transaction's status. Account credit actions are taken based on this value." cta="Read full reference" href="/concepts/transactions">Status</Tooltip> of transaction.</ResponseField>
-<ResponseField name="description" type="string">Description of the collection transaction.</ResponseField>
-<ResponseField name="charge_type" type="string">
-<mark>Party charged</mark> for the transaction. [See charge type reference](/concepts/transactions)
-
-Available values: `merchant`, `customer`, `split`
-</ResponseField>
-<ResponseField name="createdAt" type="string">Date the collection transaction was created, in ISO timestamp format.</ResponseField>
-<ResponseField name="updatedAt" type="string">Date the collection transaction was last updated, in ISO timestamp format.</ResponseField>
-<ResponseField name="payment_account_name" type="string">Name on the payment account.</ResponseField>
-<ResponseField name="payment_account_number" type="string">Number of the payment account.</ResponseField>
-<ResponseField name="currency" type="string" default="GHS">Currency of the transaction.</ResponseField>
-<ResponseField name="payment_account_issuer" type="string"><Tooltip headline="Issuers on PeoplesPay" tip="Issuers are the business entities that own payment or recipient accounts (mobile money operators, banks, card schemes, etc.) We maintain a definitive list of issuers and their codes." cta="Go to issuer reference" href="/concepts/account-issuers">Issuer</Tooltip> of the payment account.</ResponseField>
-<ResponseField name="payment_account_type" type="string">
-Type of the payment account.
-
-Available values: `momo`, `card`, `union`
-</ResponseField>
-<ResponseField name="recipient_account_name" type="string">Name of the recipient account.</ResponseField>
-<ResponseField name="recipient_account_number" type="string">Number of the recipient account.</ResponseField>
-<ResponseField name="recipient_account_issuer_name" type="string"><Tooltip headline="Issuers on PeoplesPay" tip="Issuers are the business entities that own payment or recipient accounts (mobile money operators, banks, card schemes, etc.) We maintain a definitive list of issuers and their codes." cta="Go to issuer reference" href="/concepts/account-issuers">Issuer</Tooltip> of the recipient account.</ResponseField>
-<ResponseField name="recipient_account_type" type="string" default="wallet">Type of the recipient account. For collections, this value is `wallet`</ResponseField>
-<ResponseField name="externalTransactionId" type="string">External transaction identifier, specified by merchant.</ResponseField>
-<ResponseField name="appId" type="string">Identifier of the <Tooltip headline="Apps on PeoplesPay" tip="Apps are API profiles within a merchant account. They have unique IDs and apikeys." cta="Learn more about apps" href="/concepts/merchants"><mark>app</mark></Tooltip> that initiated the transaction.</ResponseField>
-<ResponseField name="callbackUrl" type="string">URL used for transaction callbacks. <Tooltip headline="Webhook events" tip="Webhook events are sent when a collection transaction's status is updated. If you retry the webhook event delivery, it will be sent to value specified in this field." cta="View webhook event reference" href="events/webhook-event-overview">Webhook events</Tooltip> are sent to this location.</ResponseField>
-<ResponseField name="semantic_id" type="string">Semantic identifier for the transaction.</ResponseField>
-<ResponseField name="gtbRef" type="string">
-GTB transaction reference.
-
-Can be `null`
-</ResponseField>
-<ResponseField name="payment_account_issuer_name" type="string">Display name of the payment account issuer.</ResponseField>
-<ResponseField name="reason" type="string">Reason accompanying the transaction status.</ResponseField>
-<ResponseField name="debitTimeStamp" type="string">Date and time the payment account was debited, in ISO timestamp format. Determined based on webhook receipt time.</ResponseField>
-<ResponseField name="providerId" type="string">Provider-specific transaction identifier.</ResponseField>
-<ResponseField name="telecelOriginalConversationID" type="string">Original Telecel conversation identifier.</ResponseField>
-<ResponseField name="telecelTransactionID" type="string">Telecel transaction identifier.</ResponseField>
-<ResponseField name="debit_status" type="string">Status of the debit leg of the transaction.</ResponseField>
-### More properties
-<ResponseField name="reference" type="string"><Expandable title="description">PeoplesPay-generated numeric transaction reference.</Expandable></ResponseField>
-<ResponseField name="credit_type" type="string" deprecated><Expandable title="description">Type of credit applied to the transaction.</Expandable></ResponseField>
-<ResponseField name="fabRef" type="string" deprecated><Expandable title="description">FAB transaction reference.</Expandable></ResponseField>
-<ResponseField name="elevyCharges" type="string" deprecated><Expandable title="description">Electronic levy charges applied to the transaction.</Expandable></ResponseField>
-<ResponseField name="elevyApplied" type="string" deprecated><Expandable title="description">Indicates whether the electronic levy was applied.</Expandable></ResponseField>
-<ResponseField name="zeepayRef" type="string" deprecated><Expandable title="description">Zeepay transaction reference.</Expandable></ResponseField>
-<ResponseField name="credit_aggregator" type="string" deprecated><Expandable title="description">Aggregator that processed the credit transaction.</Expandable></ResponseField>
-<ResponseField name="billMerchant" type="string"><Expandable title="description">Merchant associated with the bill transaction.</Expandable></ResponseField>
-<ResponseField name="debitChannel" type="string" default="TELCO"><Expandable title="description">Channel used to debit the payment account.</Expandable></ResponseField>
-<ResponseField name="parentTransactionReference" type="string"><Expandable title="description">Reference of the parent transaction.</Expandable></ResponseField>
-<ResponseField name="openapi_ref" type="string"><Expandable title="description">
-MTN-specific OpenAPI transaction reference.
-
-Can be `null`
-</Expandable>
-</ResponseField>
-</View>
 ## Related events
 - `transaction.status.updated` - Fired when the status of a transaction is updated. See [event reference](/api-reference/events).
 
 ## Endpoints
 |Method|Path|Description|
 |---|---|---|
-|<Badge color="blue">POST</Badge>|[`/hub/token/get`](/api-reference/endpoint/get-token)|Generate bearer token for collection request|
+|<Badge color="blue">POST</Badge>|[`/hub/token/get`](/api-reference/endpoint/get-token-collection)|Generate bearer token for collection request|
 |<Badge color="blue">POST</Badge>|[`/hub/collectmoney`](/api-reference/endpoint/collect-momo)|Initiate collection via mobile money channel|
 |<Badge color="blue">POST</Badge>|[`/hub/collectmoney/card`](/api-reference/endpoint/collect-card)|Initiate collection via bank card|
+|<Badge color="blue">POST</Badge>|[`/api/checkout/redirect/init`](/api-reference/endpoint/collect-checkout)|Initiate collection via hosted checkout|
+
+<Danger>
+Collections are fully asynchronous. The synchronous HTTP response you receive when calling [`/hub/collectmoney`](/api-reference/endpoint/collect-momo) or [`/hub/collectmoney/card`](/api-reference/endpoint/collect-card) simply indicates whether PeoplesPay has successfully received your request for processing. ALWAYS wait for the webhook notification before making any updates in your application.
+</Danger>
+
+## How to: performing an API collection
+<Steps>
+<Step>
+Call <Badge color="green">GET</Badge> `/hub/token/get`. Set `operation` in the request payload to `"DEBIT"`. The resulting authentication token can be used for up to 60 minutes before having to request a fresh one.
+</Step>
+<Step>
+Call <Badge color="blue">POST</Badge> `/hub/collectmoney` or `/hub/collectmoney/card`. Use the token obtained in step 1 as the `Bearer` token value.
+</Step>
+<Step>
+Wait for the webhook notification at the supplied `callbackUrl`
+</Step>
+</Steps>
+
+<Note>
+For hosted checkout, no token authentication is required.
+</Note>

@@ -11,75 +11,61 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Documentation",
+        "tab": "Platform",
         "groups": [
           {
-            "group": "Get Started",
+            "group": "Get started",
             "pages": [
               "introduction",
               "quickstart"
             ]
           },
           {
-            "group": "Platform reference",
+            "group": "Using the platform",
             "pages": [
-              "concepts/transactions",
-              "concepts/account-issuers"
-            ]
-          },
-          {
-            "group": "Authentication",
-            "pages": [
-              "authentication/merchants"
-            ]
-          },
-          {
-            "group": "Operations",
-            "pages": [
+                "authentication/merchants", 
               {
-                "group": "Collections",
+                "group": "Executing transactions",
                 "pages": [
-                  "collections/collections-api",
-                  "collections/collections-checkout"
+                    "collections/collections-api",
+                    "collections/collections-checkout",
+                    "disbursements/disbursements-api"
+                  ]
+              },
+              {
+                "group": "Events",
+                "pages": [
+                  "events/events-overview",
+                  "events/webhook-notification-overview"
                 ]
               },
               {
-                "group": "Disbursements",
+                "group": "Errors",
                 "pages": [
-                  "disbursements/disbursements-api",
-                  "disbursements/disbursements-portal"
-                ]
-              },
-              {
-                "group": "Bill Payments",
-                "pages": [
-                  "bills/overview"
+                  "errors/error-codes"
                 ]
               }
             ]
           },
           {
-            "group": "Errors",
+            "group": "Learn",
             "pages": [
-              "errors/error-codes"
+                "concepts/transactions",
+                "concepts/account-issuers",
+                "concepts/merchants"
             ]
           },
-          {
-            "group": "Features",
+          { 
+            "group": "Integrate",
             "pages": [
-              {
-                "group": "Webhook events",
-                "root": "events/webhook-event-overview",
-                "pages": [
-                  "events/transaction-events"
-                ]
-              }
+              "integration/introduction",
+              "integration/checklist"
             ]
           }
         ]
       },
       {
-        "tab": "API Reference",
+        "tab": "API reference",
         "groups": [
           {
             "group": "API Documentation",
@@ -90,54 +76,53 @@
           {
             "group": "Authentication",
             "pages": [
+              "api-reference/authentication",
               "api-reference/endpoint/merchant-login"
             ]
           },
           {
-            "group": "Account management",
+            "group": "Merchant operations",
             "pages": [
+              "api-reference/endpoint/get-merchant-profile",
+              "api-reference/endpoint/get-merchant-users",
               "api-reference/endpoint/get-balance"
             ]
           },
           {
-            "group": "Merchant utility requests",
+            "group": "Utility requests",
             "pages": [
               "api-reference/endpoint/name-enquiry"
             ]
           },
           {
-            "group": "Transaction execution",
+            "group": "Transactions",
             "pages": [
+              "api-reference/transactions",
               {
                 "group": "Collections",
                 "pages": [
                   "api-reference/collections",
-                  "api-reference/endpoint/get-token",
+                  "api-reference/endpoint/get-token-collection",
                   "api-reference/endpoint/collect-momo",
                   "api-reference/endpoint/collect-card"
                 ]
               },
               {
                 "group": "Disbursements",
-                "root": "api-reference/disbursements",
                 "pages": [
-                  "api-reference/endpoint/get-token",
+                "api-reference/disbursements",
+                  "api-reference/endpoint/get-token-disbursement",
                   "api-reference/endpoint/disburse"
                 ]
-              }
-            ]
-          },
-          {
-            "group": "Transaction management",
-            "pages": [
+              },
               "api-reference/endpoint/get-transaction",
               "api-reference/endpoint/get-transactions"
             ]
           },
           {
             "group": "Events",
-            "root": "api-reference/events",
             "pages": [
+              "api-reference/events",
               "api-reference/endpoint/get-events",
               "api-reference/endpoint/get-event",
               "api-reference/endpoint/fire-event"

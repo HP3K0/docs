@@ -1,43 +1,67 @@
 ---
-title: "Events"
-description: "All about events"
+title: "Introduction"
+description: "Managing events and webhook notifications"
 ---
 
-Events involve API functionality involving the movement of money, including collections, disbursements and the like
+Events are created within the PeoplesPay platform when specific conditions are met. Events are then delivered to webhook URLs as a <Badge color="blue">POST</Badge> request, which we refer to as a webhook notification. Currently, webhook notifications are delivered only for transaction status updates, to the `callbackUrl` specified during transaction initiation.
 
 <Panel>
-    <Tabs>
-    <Tab>
-    fasfd
-    </Tab>
-    <Tab>
-    fasfd
-    </Tab>
-    </Tabs>
-    ---
-        <RequestExample>
-     ```json
+```json Event object
 {
-  "eventId": "6a8fcecad33dc394480b8406",
-  "amount": 0.1,
-  "status": "failed",
-  "date": "2026-08-27T05:44:27.748Z",
-  "message": "MTN status: FAILED; COULD_NOT_PERFORM_TRANSACTION",
-  "success": true,
-  "code": "02",
-  "externalTransactionId": "runningateston1787809465"
+    "_id": "69048133c5c4555f694ca13b",
+    "eventType": "transaction.status.updated",
+    "createdAt": "2025-10-24T18:30:16.840Z",
+    "eventData": {
+        "transactionId": "69048132c5c4555f694ca12e",
+        "amount": 1557,
+        "status": "paid",
+        "date": "2025-10-31T09:28:18.477Z",
+        "message": "Transaction processed successfully",
+        "externalTransactionId": "17619028980421251075",
+        "code": "00",
+        "success": true
+    },
+    "deliveryStatus": "DELIVERED",
+    "destination": "https://payments.prod.mypaygate.co/gh/notifications/v1/transaction-notification",
+    "customerId": "68303bcce2a5708c5673751c",
+    "customerType": "merchants",
+    "__v": 0,
+    "deliveredAt": "2025-10-31T09:28:19.808Z",
+    "lastAttemptedAt": "2025-10-31T09:28:19.808Z",
+    "numberOfAttempts": 1
 }
 ```   
-    </RequestExample>
-    
 </Panel>
 
 
----
 
-Operations object
-
-
-
-<ResponseField>
+## The event object
+<ResponseField name="id" type="string">ID of event</ResponseField>
+<ResponseField name="eventType" type="string"><Tooltip headline="Event types" tip="Events can be of different types. The event object will specify what kind of event is emitted and delivered to a URL." cta="Refer to event types" href="/events/webhook-event-overview">Event type</Tooltip>.</ResponseField>
+<ResponseField name="createdAt" type="string">ISO timestamp of event creation time.</ResponseField>
+<ResponseField name="eventData" type="object">
+Event data payload, containing details on the <mark>instance</mark>
 </ResponseField>
+<ResponseField name="deliveryStatus" type="enum<string>">
+The status of the webhook notification's delivery to the webhook URL.
+
+Available values: `DELIVERED`, `AWAITING_DELIVERY`, `DELIVERY_ATTEMPTED`, `FAILED`
+</ResponseField>
+<ResponseField name="destination" type="string">URL the webhook notification is delivered to.</ResponseField>
+<ResponseField name="customerId" type="string">ID of customer the event was created for.</ResponseField>
+<ResponseField name="customerType" type="enum<string>" default="merchant">
+Type of the customer the event was created for.
+
+Available value: `merchants`, `customers`, `donations`
+</ResponseField>
+<ResponseField name="deliveredAt" type="string">ISO timestamp at which the acknowledgement of webhook notification delivery was received on PeoplesPay.</ResponseField>
+<ResponseField name="lastAttemptedAt" type="string">ISO timestamp of the most recent attempted webhook notification delivery.</ResponseField>
+<ResponseField name="numberOfAttempts" type="number">Count of total attempted webhook notification deliveries.</ResponseField>
+
+
+## Types of events
+|Event type|Description|Payload|
+|---|---|---|
+|`transaction.status.updated`|This event type is created and delivered whenever a transaction status changes.|`eventData` is a [collection](/api-reference/collections#properties) or [disbursement](/api-reference/disbursements#properties)
+
+

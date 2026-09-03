@@ -1,0 +1,21 @@
+---
+title: "Primer"
+description: "How authentication works"
+---
+
+Authentication is rather straightforward on the PeoplesPay platform. You employ two types of `Bearer` tokens for all API requests.
+
+## The merchant login token
+The merchant login token is generated upon [merchant user login](/api-reference/endpoint/merchant-login)
+
+## The transaction execution token
+This authentication token is generated and used specifically to initiate collections **or** disbursements.
+
+- To perform a collection, [set the](/api-reference/endpoint/get-token-collection) `operation` field to `DEBIT` i.e. you wish to **debit** a payer's account.
+- To perform a disbursement, [set the](/api-reference/endpoint/get-token-disbursement) `operation` field to `CREDIT` i.e. you wish to **credit** a recipient's account.
+
+<Check>
+It's a good idea to **cache** the generated token for repeated use. Time-to-live is 60 minutes.
+</Check>
+
+If you're experiencing difficulties with token generation, [reach out to support](mailto:ppsupport@bsystemslimited.com)

@@ -1,0 +1,50 @@
+---
+title: 'Webhook notifications'
+icon: circle-exclamation
+description: 'Receive webhook notifications for PeoplesPay events.'
+---
+
+Webhook notifications are a crucial component to our payment flows, helping you stay informed in real-time whenever specific events occur on our platform. The main current usecase on PeoplesPay is tracking payment transactions, with more in the pipeline. Contact support to place requests for new event types and payloads.
+
+## Webhook notification delivery strategy
+
+Webhook notifications will be sent from the IPs listed below. Changes will be communicated with active merchants.
+|PeoplesPay-owned IP address|DNS resolves from|Active?|
+|---|---|---|
+|3.15.51.144|`peoplespay.com.gh`|Yes|
+
+Once an event is created within PeoplesPay, the corresponding webhook notification is delivered to the supplied `callbackUrl`. The webhook notification is sent as a `POST` request. Webhook notifications are only considered `DELIVERED` if PeoplesPay receives a HTTP `200 OK` response to the <Badge color="blue">POST</Badge> request. Delivery is attempted once upon event creation, then retried up to 4 times, with an initial 15-second delay and exponential backoff (factor 2).
+
+After that, undelivered webhook notifications are picked up by a scheduled job that runs hourly; delivery is attempted once and retried two more times for every job run.
+
+The scheduled job only attempts webhook notification delivery for events created within the previous 24 hours. Beyond that, either [fire the webhook notification delivery](/api-reference/endpoint/fire-event) yourself or [contact support](mailto:ppsupport@bsystemslimited.com).
+
+
+<Note>
+For a technical reference of the event object, [see this page](/api-reference/events).
+</Note>
+
+## Webhook notification statuses
+|Status|Description|Type|
+|---|---|---|
+|`AWAITING_DELIVERY`|Initial status of a webhook notification|Intermediate|
+|`DELIVERY_ATTEMPTED`|At least one attempt has been made to deliver webhook notification; no `HTTP 200` was received|Intermediate|
+|`DELIVERED`|Delivery attempt made, `HTTP 200` received|Terminal|
+|`FAILED`|Multiple delivery attempts made over 24h. No `HTTP 200` received.|Terminal|
+
+```mermaid
+  %%{init: {'flowchart': {'defaultRenderer': 'elk'}}}%%
+  stateDiagram-v2
+      [*] --> AWAITING_DELIVERY : Notification created
+
+      AWAITING_DELIVERY --> DELIVERED : First attempt returns HTTP 200
+      AWAITING_DELIVERY --> DELIVERY_ATTEMPTED : First attempt fails (non-200 / no response)
+
+      DELIVERY_ATTEMPTED --> DELIVERED : Retry returns HTTP 200
+      DELIVERY_ATTEMPTED --> DELIVERY_ATTEMPTED : Retry fails (exponential backoff, within 24h window)
+
+      DELIVERY_ATTEMPTED --> FAILED : Not delivered after 24 hours
+
+      DELIVERED --> [*]
+      FAILED --> [*]
+  ```

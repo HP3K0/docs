@@ -1,34 +1,20 @@
 ---
-title: Using Checkout
+title: Collecting via checkout
 icon: cash-register
 description: Collections via PeoplesPay Checkout
 ---
 
+<Badge color="purple">Asynchronous flow</Badge>
+
 We operate a hosted checkout page that merchants can use to collect money via momo or card. This is a robust solution for accepting payments both online and in-store.
 
 ## Generate a checkout link
-You can generate a checkout link via our Checkout API. The transaction details are ingested and an automatic redirect takes place to the generated checkout page.
-
-```plaintext
-curl --location 'https://peoplespay.com.gh/api/checkout/redirect/init' \
---header 'Content-Type: application/json' \
---data '{
-    "merchantId": <YOUR_MERCHANT_ID>,
-    "appId": <YOUR_APP_ID>,
-    "amount": "1",
-    "currency": "GHS",
-    "description": "Testing fees",
-    "payer": "Paul",
-    "callbackUrl": <YOUR_CALLBACK_URL>,
-    "clientRedirectUrl": <YOUR_REDIREECT_URL>
-}'
-```
+You can generate a checkout link using the [checkout redirect endpoint](/api-reference/endpoint/collect-checkout). The transaction details are ingested and an automatic redirect takes place to the generated checkout page.
 
 Find your `appId` on the merchant portal. For more information, read up on [merchant accounts](/concepts/merchants).
 
-
 ## Hosted checkout page
-Our hosted checkout page leverages Cloudflare Turnstile for human verification. For card payments, the page will handle the payment using an `iframe` that wraps the card scheme flow (Mastercard, for now) along with 3D Secure if enforced by the issuing bank.
+Our hosted checkout page leverages Cloudflare Turnstile for human verification. For card payments, the page will handle the payment using an `iframe` that wraps the card scheme flow (currently Mastercard) along with 3D Secure if enforced by the issuing bank.
 
 ![image](/images/checkout.png)
 
