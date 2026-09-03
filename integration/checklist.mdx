@@ -9,13 +9,15 @@ We've put together a checklist of integration aspects to review before final sig
 |Action|Importance|
 |---|---|
 |Verify applied transaction charges in accordance with merchant agreement (SLA)|Critical|
-|Process repeated webhook notifications idempotently|High|
 |Target the `status` field for merchant-side transaction status updates and cascading actions|Critical|
+|Process repeated webhook notifications idempotently|High|
 |Pass `externalTransactionId` when initiating transactions|High|
-|Cache authentication tokens for transaction execution|Low|
 |Blacklist non-PeoplesPay IP address for webhook notification processing|High|
-|Programmatic access to merchant account balance|Low|
+|(Card proceessing) Support DOM injection to render 3D Secure challenge for end-users|High|
 |Confirm transaction data retrieval (via both API and merchant portal)|High|
+|Store PeoplesPay transaction ID in merchant-side DB for sync and `externalTransactionId` fallback|Medium|
+|Programmatic access to merchant account balance|Low|
+|Cache authentication tokens for transaction execution|Low|
 
 <Danger>
 Correctly processing webhook notifications is crucial. Mistakes and errors here can seriously undermine your integration.
