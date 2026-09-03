@@ -1,0 +1,47 @@
+---
+title: Troubleshooting
+description: Troubleshooting your PeoplesPay integration
+---
+
+If you're experiencing difficulties with your integration, either during development or after having gone live, we might have your case covered.
+
+<AccordionGroup>
+<Accordion title="You can't access `peoplespay.com.gh`">
+If the main domain isn't reachable, try accessing our main static IP address directly: `3.15.51.144`. We will notify you if this static IP address changes.
+<Note>
+It is a good idea to add our static IP as an automatic fallback. In the event of a DNS outage, your application could switch to calling the IP directly.
+</Note>
+</Accordion>
+<Accordion title="You can't access any PeoplesPay functions (merchant portal, API, etc.)">
+Check your network configuration. Ensure you're accessing `peoplespay.com.gh`
+If the main domain isn't reachable, try accessing our main static IP address directly: `3.15.51.144`. We will notify you if this static IP address changes.
+<Note>
+It is a good idea to add our static IP as an automatic fallback. In the event of a DNS outage, your application could switch to calling the IP address directly.
+</Note>
+</Accordion>
+<Accordion title="You encounter authentication errors">
+Ensure you are using the right token for the operation you are trying to perform. Remember:
+- To initiate a collection, ensure you [correctly generate](/api-reference/endpoint/get-token-collection) the authentication token by setting the `operation` key in the <Badge color="blue">POST</Badge> request to `DEBIT`.
+- To initiate a disbursement, [generate](/api-reference/endpoint/get-token-disbursement) the authentication token by setting the `operation` field in the <Badge color="blue">POST</Badge> request to `CREDIT`.
+- For other API calls (including looking up transactions, getting your account balance, etc.), make sure to use the [merchant login endpoint](/api-reference/endpoint/merchant-login).
+</Accordion>
+<Accordion title="You aren't receiving status updates for transactions">
+This could be due to a couple different reasons.
+- Double-check your webhook notification processing logic. Look at the [`event`] object, and ensure your webhook handler is parsing the object properly
+- Make sure you include a valid webhook endpoint in the `callbackUrl` field when initiating a transaction.
+</Accordion>
+<Accordion title="Your transaction lookup returns `HTTP 500` with a not found message">
+Do the following:
+- Make sure the ID you've specified is either a valid PeoplesPay transaction ID or one of your `externalTransactionId`s.
+- If your search term is `externalTransactionId` generated in your application, ensure the HTTP request for transaction initiation actually completed. To do that, wait for the synchronous response before attempting to look up a transaction.
+
+<Warning>
+For errors that prevent the transaction from being initiated, a retrieval with `externalTransactionId` will raise a "Transaction not found" error; the transaction wasn't created and stored in the PeoplesPay DB.
+</Warning>
+</Accordion>
+<Accordion title="You receive repeated webhook notifications for the same transaction">
+Make sure to respond with `HTTP 200` to webhook notification requests from PeoplesPay. That is how we detect successful webhook notification delivery and do not attempt further deliveries.
+</Accordion>
+</AccordionGroup>
+
+If you need further help or guidance, don't hesitate to reach out to [support](mailto:ppsupport@bsystemslimited.com).
