@@ -15,6 +15,7 @@
         "groups": [
           {
             "group": "Get started",
+            "icon": "play",
             "pages": [
               "introduction",
               "quickstart"
@@ -22,6 +23,7 @@
           },
           {
             "group": "Using the platform",
+            "icon": "sliders",
             "pages": [
                 "authentication/merchants", 
               {
@@ -49,6 +51,7 @@
           },
           {
             "group": "Learn",
+            "icon": "graduation-cap",
             "pages": [
                 "concepts/transactions",
                 "concepts/account-issuers",
@@ -57,9 +60,11 @@
           },
           { 
             "group": "Integrate",
+            "icon": "plug",
             "pages": [
               "integration/introduction",
-              "integration/checklist"
+              "integration/checklist",
+              "integration/troubleshooting"
             ]
           }
         ]
@@ -126,6 +131,12 @@
               "api-reference/endpoint/get-events",
               "api-reference/endpoint/get-event",
               "api-reference/endpoint/fire-event"
+            ]
+          },
+          {
+            "group": "Webhooks",
+            "pages": [
+              "api-reference/endpoint/"
             ]
           }
         ]
