@@ -1,0 +1,43 @@
+---
+title: Introduction
+icon: plug
+description: Integrating with PeoplesPay
+---
+
+Integration is the process of consuming the PeoplesPay APIs in your application. A number of prerequisites and 
+
+## Prerequisites
+<Accordion title="Complete onboarding">
+You need to have completed onboarding, with a fully active merchant instance on PeoplesPay and a signed agreement to proceed with integration.
+</Accordion>
+<Accordion title="Merchant portal access">
+You'll need access to the merchant portal (i.e. login credentials), to [create your first app](/concepts/merchants) and retrieve its corresponding API key.
+</Accordion>
+
+
+## Technical considerations
+Once you have a created app and an API key, you may begin integration. Use the [API reference](/api-reference/introduction) and read up on how the platform works to integrate properly and to avoid potential pitfalls.
+<Info>
+If at any time you require assistance, speak to your onboarding manager, or [contact support](mailto:ppsupport@bsystemslimited.com).
+</Info>
+
+## Live transaction testing
+Live transaction testing is a crucial aspect of integration. It ensures production-environment alignment through executing small-value transactions. Here's what to look out for:
+
+- account balance before and after completing transactions
+- correctly receiving and processing webhook notifications (e.g. to update transaction statuses)
+- passing merchant-generated transaction IDs under `externalTransactionId`
+- executing transactions in different modes (e.g. simultaneous transactions, out-of-bounds values, exceeding balances, etc.)
+- receiving USSD prompts for mobile money collections
+- verifying recipient names before performing disbursements
+
+
+<Note>
+If you need payment or receipient account details to run tests, speak to your onboarding manager.
+</Note>
+
+## Review and sign-off
+Go through the [integration checklist](/integration/checklist) for clear guidelines on how to review your integration.
+
+
+
