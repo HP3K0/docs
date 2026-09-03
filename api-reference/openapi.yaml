@@ -220,7 +220,7 @@ paths:
       parameters:
         - name: id
           in: path
-          description: ID of transaction to retrieve
+          description: ID of transaction to retrieve. Can be a PeoplesPay transaction ID or an `externalTransactionId`.
           required: true
           schema:
             type: string
@@ -1205,9 +1205,16 @@ components:
                 - paid
                 - pp
                 - failed
+                - pc
+                - TCS-PENDING
+              description: Transaction [status](/concepts/transactions).
             transactionId:
               type: string
-              description: The ID of the transaction being looked up.
+              description: The PeoplesPasy ID of the transaction being looked up. Alternatively, it is the PeoplesPay ID of the first returned transaction if multiple transactions were retrieved i.e. the `externalTransactionId` passed matches more than one record.
+            reference:
+              type: string
+              description: Generic transaction reference.
+              deprecated: true
             data:
               type: object<[Transaction]()>
               description: "Contains [`Transaction`](/api-reference/transactions) object."
